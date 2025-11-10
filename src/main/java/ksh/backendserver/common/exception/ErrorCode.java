@@ -7,6 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
 
+    MEMBER_NOT_FOUND(404, "member.not.found"),
+
     INTERNAL_SERVER_ERROR(500, "internal.server.error");
 
     private final int status;
