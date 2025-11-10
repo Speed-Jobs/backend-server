@@ -39,4 +39,27 @@ public class MemberController {
              null
          );
     }
+
+    @PostMapping("/logout")
+    public ApiResponseDto<Void> logout(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+
+        if(session == null) {
+            return ApiResponseDto.of(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.name(),
+                "로그인 상태가 아닙니다.",
+                null
+            );
+        }
+
+        session.invalidate();
+
+        return ApiResponseDto.of(
+            HttpStatus.OK.value(),
+            HttpStatus.OK.name(),
+            "로그아웃에 성공했습니다.",
+            null
+        );
+    }
 }
