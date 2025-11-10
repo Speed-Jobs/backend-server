@@ -3,13 +3,15 @@ package ksh.backendserver.post.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import ksh.backendserver.post.dto.projection.PostWithCompany;
+import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
+import ksh.backendserver.role.entity.QJobRole;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 import static ksh.backendserver.company.entity.QCompany.company;
 import static ksh.backendserver.post.entity.QPost.post;
+import static ksh.backendserver.role.entity.QJobRole.*;
 
 @RequiredArgsConstructor
 public class PostQueryRepositoryImpl implements PostQueryRepository {
@@ -18,15 +20,16 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
 
     @Override
-    public List<PostWithCompany> findByIdInOrderByCreatedAtDesc(
+    public List<PostWithCompanyAndRole> findByIdInOrderByCreatedAtDesc(
         List<Long> companyIds,
         int size
     ) {
         return queryFactory
             .select(Projections.constructor(
-                PostWithCompany.class,
+                PostWithCompanyAndRole.class,
                 post,
-                company
+                company,
+                jobRole
             ))
             .from(post)
             .join(company)
