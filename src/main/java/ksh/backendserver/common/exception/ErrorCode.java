@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum ErrorCode {
 
     MEMBER_NOT_FOUND(404, "member.not.found"),
-
+    MEMBER_DUPLICATE_EMAIL(400, "member.duplicate.email"),
+    MEMBER_PASSWORD_MISMATCH(400, "member.password.mismatch"),
     INTERNAL_SERVER_ERROR(500, "internal.server.error");
 
     private final int status;
