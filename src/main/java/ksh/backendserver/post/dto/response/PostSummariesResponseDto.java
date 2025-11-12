@@ -1,6 +1,5 @@
-package ksh.backendserver.company.dto.response;
+package ksh.backendserver.post.dto.response;
 
-import ksh.backendserver.post.dto.response.PostSummaryResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
