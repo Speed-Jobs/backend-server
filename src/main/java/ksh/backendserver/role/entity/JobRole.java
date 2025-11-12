@@ -14,7 +14,7 @@ import org.hibernate.annotations.Where;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "update member set is_deleted = true where id = ?")
+@SQLDelete(sql = "update job_role set is_deleted = true where id = ?")
 @Where(clause = "is_deleted = false")
 public class JobRole extends BaseEntity {
 
