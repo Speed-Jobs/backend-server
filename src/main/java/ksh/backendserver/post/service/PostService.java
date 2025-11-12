@@ -1,8 +1,12 @@
 package ksh.backendserver.post.service;
 
+import ksh.backendserver.post.dto.request.PostRequestDto;
+import ksh.backendserver.post.model.PostInfo;
 import ksh.backendserver.post.model.PostSummary;
 import ksh.backendserver.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,5 +32,15 @@ public class PostService {
             .map(post -> PostSummary.from(post, LocalDate.now(clock)))
             .toList();
 
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostInfo> findCompetitorPosts(
+        PostRequestDto dto,
+        Pageable pageable
+    ) {
+        return postRepository
+            .findByFilters(dto, pageable)
+            .map(post -> PostInfo.from(post, LocalDate.now(clock)));
     }
 }
