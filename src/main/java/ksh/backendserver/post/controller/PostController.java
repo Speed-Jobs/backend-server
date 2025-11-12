@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import ksh.backendserver.common.dto.request.PageRequestDto;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
 import ksh.backendserver.common.dto.response.PageResponseDto;
-import ksh.backendserver.company.dto.response.PostSummariesResponseDto;
+import ksh.backendserver.post.dto.response.PostSummariesResponseDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.dto.request.PostSummaryRequestDto;
 import ksh.backendserver.post.dto.response.PostResponseDto;
