@@ -12,4 +12,6 @@ public interface PostQueryRepository {
     List<PostWithCompanyAndRole> findByIdInOrderByCreatedAtDesc(List<Long> companyIds, int size);
 
     Page<PostWithCompanyAndRole> findByFilters(PostRequestDto postRequestDto, Pageable pageable);
+
+    PostWithCompanyAndRole getByIdWithCompanyAndRole(Long postId);
 }
