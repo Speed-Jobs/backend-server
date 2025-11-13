@@ -1,9 +1,11 @@
 package ksh.backendserver.post.service;
 
 import ksh.backendserver.post.dto.request.PostRequestDto;
+import ksh.backendserver.post.model.PostDetail;
 import ksh.backendserver.post.model.PostInfo;
 import ksh.backendserver.post.model.PostSummary;
 import ksh.backendserver.post.repository.PostRepository;
+import ksh.backendserver.skill.repository.PostSkillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostSkillRepository postSkillRepository;
     private final Clock clock;
 
     @Transactional(readOnly = true)
@@ -42,5 +45,13 @@ public class PostService {
         return postRepository
             .findByFilters(dto, pageable)
             .map(post -> PostInfo.from(post, LocalDate.now(clock)));
+    }
+
+    @Transactional(readOnly = true)
+    public PostDetail getPostDetail(Long postId) {
+        var postData = postRepository.getByIdWithCompanyAndRole(postId);
+        var skillNames = postSkillRepository.findSkillNamesByPostId(postId);
+
+        return PostDetail.from(postData, skillNames, LocalDate.now(clock));
     }
 }
