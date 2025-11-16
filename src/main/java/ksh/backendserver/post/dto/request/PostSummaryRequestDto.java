@@ -15,7 +15,11 @@ public class PostSummaryRequestDto {
 
     @Min(value = 1, message = "조회 개수는 최소 1개 입니다.")
     @Max(value = 20, message = "조회 개수는 최대 20개 입니다.")
-    private Integer limit = 10;
+    private Integer limit;
 
     private List<Long> companyIds;
+
+    public Integer getLimit() {
+        return limit != null ? limit : 10;
+    }
 }
