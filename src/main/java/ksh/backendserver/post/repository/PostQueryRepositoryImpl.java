@@ -27,12 +27,15 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    //TODO: 남은 일수로 정렬하는 거 다시 해야함 지금은 그냥 마감날짜로 정렬한 거임
     @Override
     public List<PostWithCompanyAndRole> findByIdInOrderByCreatedAtDesc(
         List<Long> companyIds,
         int size
     ) {
+        BooleanExpression companyIdsFilter = companyIds == null || companyIds.isEmpty()
+            ? null
+            : post.companyId.in(companyIds);
+
         return queryFactory
             .select(Projections.constructor(
                 PostWithCompanyAndRole.class,
@@ -45,7 +48,11 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .on(post.companyId.eq(company.id))
             .join(jobRole)
                 .on(post.roleId.eq(jobRole.id))
-            .where(post.companyId.in(companyIds))
+            .where(
+                companyIdsFilter,
+                post.status.eq(PostStatus.OPEN),
+                post.isDeleted.eq(false)
+            )
             .orderBy(post.postedAt.desc())
             .limit(size)
             .fetch();
@@ -86,7 +93,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private Predicate postFilter(PostRequestDto dto) {
         BooleanExpression workTypeEq = dto.getWorkType() == null ? null : post.workType.eq(dto.getWorkType());
-        BooleanExpression companyNamesIn = dto.getCompanyNames().isEmpty() ? null : company.name.in(dto.getCompanyNames());
+        BooleanExpression companyNamesIn = dto.getCompanyNames() == null || dto.getCompanyNames().isEmpty() ? null : company.name.in(dto.getCompanyNames());
         BooleanExpression statusOpen = post.status.eq(PostStatus.OPEN);
 
         return ExpressionUtils.allOf(workTypeEq, companyNamesIn, statusOpen);
