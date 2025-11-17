@@ -14,4 +14,6 @@ public interface PostSkillQueryRepository {
     List<SkillWithCount> findTopSkillOrderByCountDesc(int size, DateRange timePeriod, LocalDate end);
 
     Long countBySkillIdSince(long skillId, LocalDateTime baseTime);
+
+    Long countBySkillIdBetween(long skillId, LocalDateTime start, LocalDateTime end);
 }

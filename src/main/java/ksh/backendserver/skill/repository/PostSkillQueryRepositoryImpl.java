@@ -77,4 +77,23 @@ public class PostSkillQueryRepositoryImpl implements PostSkillQueryRepository {
             )
             .fetchOne();
     }
+
+    @Override
+    public Long countBySkillIdBetween(
+        long skillId,
+        LocalDateTime start,
+        LocalDateTime end
+    ) {
+        return queryFactory
+            .select(postSkill.postId.count())
+            .from(postSkill)
+            .join(skill).on(postSkill.skillId.eq(skill.id))
+            .join(post).on(postSkill.postId.eq(post.id))
+            .where(
+                post.postedAt.between(start, end),
+                skill.id.eq(skill.id),
+                postSkill.isDeleted.isFalse()
+            )
+            .fetchOne();
+    }
 }
