@@ -91,6 +91,28 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
+    @Override
+    public PostWithCompanyAndRole getByIdWithCompanyAndRole(Long postId) {
+        PostWithCompanyAndRole result = queryFactory
+            .select(Projections.constructor(
+                PostWithCompanyAndRole.class,
+                post,
+                company,
+                jobRole
+            ))
+            .from(post)
+            .join(company).on(post.companyId.eq(company.id))
+            .join(jobRole).on(post.roleId.eq(jobRole.id))
+            .where(post.id.eq(postId))
+            .fetchOne();
+
+        if (result == null) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
+
+        return result;
+    }
+
     private Predicate postFilter(PostRequestDto dto) {
         BooleanExpression workTypeEq = dto.getWorkType() == null ? null : post.workType.eq(dto.getWorkType());
         BooleanExpression companyNamesIn = dto.getCompanyNames() == null || dto.getCompanyNames().isEmpty() ? null : company.name.in(dto.getCompanyNames());
@@ -113,27 +135,5 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         OrderSpecifier<Long> tieBreaker = new OrderSpecifier<>(order, post.id);
 
         return new OrderSpecifier<?>[]{primaryOrder, tieBreaker};
-    }
-
-    @Override
-    public PostWithCompanyAndRole getByIdWithCompanyAndRole(Long postId) {
-        PostWithCompanyAndRole result = queryFactory
-            .select(Projections.constructor(
-                PostWithCompanyAndRole.class,
-                post,
-                company,
-                jobRole
-            ))
-            .from(post)
-            .join(company).on(post.companyId.eq(company.id))
-            .join(jobRole).on(post.roleId.eq(jobRole.id))
-            .where(post.id.eq(postId))
-            .fetchOne();
-
-        if (result == null) {
-            throw new CustomException(ErrorCode.POST_NOT_FOUND);
-        }
-
-        return result;
     }
 }
