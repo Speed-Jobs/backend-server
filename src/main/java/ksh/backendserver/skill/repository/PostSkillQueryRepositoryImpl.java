@@ -7,6 +7,7 @@ import ksh.backendserver.skill.dto.projection.SkillWithCount;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static ksh.backendserver.post.entity.QPost.post;
@@ -57,5 +58,23 @@ public class PostSkillQueryRepositoryImpl implements PostSkillQueryRepository {
             .orderBy(postSkill.skillId.desc())
             .limit(size)
             .fetch();
+    }
+
+    @Override
+    public Long countBySkillIdSince(
+        long skillId,
+        LocalDateTime baseTime
+    ) {
+        return queryFactory
+            .select(postSkill.postId.count())
+            .from(postSkill)
+            .join(skill).on(postSkill.skillId.eq(skill.id))
+            .join(post).on(postSkill.postId.eq(post.id))
+            .where(
+                post.postedAt.goe(baseTime),
+                skill.id.eq(skill.id),
+                postSkill.isDeleted.isFalse()
+            )
+            .fetchOne();
     }
 }
