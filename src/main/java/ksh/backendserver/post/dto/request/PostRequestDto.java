@@ -1,8 +1,8 @@
 package ksh.backendserver.post.dto.request;
 
 import jakarta.validation.constraints.NotNull;
+import ksh.backendserver.post.enums.EmploymentType;
 import ksh.backendserver.post.enums.PostSortCriteria;
-import ksh.backendserver.post.enums.WorkType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PostRequestDto {
 
-    private WorkType workType;
+    private EmploymentType employmentType;
 
     private PostSortCriteria sort;
 
