@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "update member set is_deleted = true where id = ?")
+@SQLDelete(sql = "update post set is_deleted = true where id = ?")
 @Where(clause = "is_deleted = false")
 public class Post extends BaseEntity {
 
