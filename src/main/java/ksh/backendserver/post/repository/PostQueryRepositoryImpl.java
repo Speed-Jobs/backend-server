@@ -95,8 +95,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         BooleanExpression workTypeEq = dto.getWorkType() == null ? null : post.workType.eq(dto.getWorkType());
         BooleanExpression companyNamesIn = dto.getCompanyNames() == null || dto.getCompanyNames().isEmpty() ? null : company.name.in(dto.getCompanyNames());
         BooleanExpression statusOpen = post.status.eq(PostStatus.OPEN);
+        BooleanExpression notDeleted = post.isDeleted.isFalse();
 
-        return ExpressionUtils.allOf(workTypeEq, companyNamesIn, statusOpen);
+        return ExpressionUtils.allOf(workTypeEq, companyNamesIn, statusOpen, notDeleted);
     }
 
     private OrderSpecifier<?>[] postOrder(PostRequestDto dto) {
