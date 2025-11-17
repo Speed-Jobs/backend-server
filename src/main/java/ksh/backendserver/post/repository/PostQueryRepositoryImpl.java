@@ -10,12 +10,12 @@ import ksh.backendserver.common.exception.ErrorCode;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.enums.PostSortCriteria;
-import ksh.backendserver.post.enums.PostStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static ksh.backendserver.company.entity.QCompany.company;
@@ -30,7 +30,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     @Override
     public List<PostWithCompanyAndRole> findByIdInOrderByCreatedAtDesc(
         List<Long> companyIds,
-        int size
+        int size,
+        LocalDateTime now
     ) {
         BooleanExpression companyIdsFilter = companyIds == null || companyIds.isEmpty()
             ? null
@@ -50,7 +51,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .on(post.roleId.eq(jobRole.id))
             .where(
                 companyIdsFilter,
-                post.status.eq(PostStatus.OPEN),
+                post.postedAt.loe(now),
+                post.closeAt.gt(now),
                 post.isDeleted.eq(false)
             )
             .orderBy(post.postedAt.desc())
@@ -61,7 +63,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     @Override
     public Page<PostWithCompanyAndRole> findByFilters(
         PostRequestDto postRequestDto,
-        Pageable pageable
+        Pageable pageable,
+        LocalDateTime now
     ) {
         List<PostWithCompanyAndRole> content = queryFactory
             .select(Projections.constructor(
@@ -74,7 +77,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .join(company).on(post.companyId.eq(company.id))
             .join(jobRole).on(post.roleId.eq(jobRole.id))
             .where(
-                postFilter(postRequestDto)
+                postFilter(postRequestDto, now)
             )
             .orderBy(
                 postOrder(postRequestDto)
@@ -86,7 +89,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .select(post.count())
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .where(postFilter(postRequestDto));
+            .where(postFilter(postRequestDto, now));
 
         return PageableExecutionUtils.getPage(
             content,
@@ -117,22 +120,24 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return result;
     }
 
-    private Predicate postFilter(PostRequestDto dto) {
-        BooleanExpression workTypeEq = dto.getWorkType() == null
+    private Predicate postFilter(PostRequestDto dto, LocalDateTime now) {
+        BooleanExpression workTypeEq = dto.getEmploymentType() == null
             ? null
-            : post.workType.eq(dto.getWorkType());
+            : post.employmentType.eq(dto.getEmploymentType());
 
         BooleanExpression companyNamesIn = dto.getCompanyNames() == null || dto.getCompanyNames().isEmpty()
             ? null
             : company.name.in(dto.getCompanyNames());
 
-        BooleanExpression statusOpen = post.status.eq(PostStatus.OPEN);
+        BooleanExpression postedAtLessOrEqualThanNow = post.postedAt.loe(now);
+        BooleanExpression closeAtGreaterThanNow = post.closeAt.gt(now);
         BooleanExpression notDeleted = post.isDeleted.isFalse();
 
         return ExpressionUtils.allOf(
             workTypeEq,
             companyNamesIn,
-            statusOpen,
+            postedAtLessOrEqualThanNow,
+            closeAtGreaterThanNow,
             notDeleted
         );
     }
