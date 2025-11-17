@@ -1,11 +1,21 @@
 package ksh.backendserver.post.repository;
 
 
-import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.*;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import ksh.backendserver.common.exception.CustomException;
+import ksh.backendserver.common.exception.ErrorCode;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
+import ksh.backendserver.post.dto.request.PostRequestDto;
+import ksh.backendserver.post.enums.PostSortCriteria;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static ksh.backendserver.company.entity.QCompany.company;
@@ -17,12 +27,16 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-
     @Override
     public List<PostWithCompanyAndRole> findByIdInOrderByCreatedAtDesc(
         List<Long> companyIds,
-        int size
+        int size,
+        LocalDateTime now
     ) {
+        BooleanExpression companyIdsFilter = companyIds == null || companyIds.isEmpty()
+            ? null
+            : post.companyId.in(companyIds);
+
         return queryFactory
             .select(Projections.constructor(
                 PostWithCompanyAndRole.class,
@@ -32,12 +46,114 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             ))
             .from(post)
             .join(company)
-                .on(post.companyId.eq(company.id))
+            .on(post.companyId.eq(company.id))
             .join(jobRole)
-                .on(post.roleId.eq(jobRole.id))
-            .where(post.companyId.in(companyIds))
+            .on(post.roleId.eq(jobRole.id))
+            .where(
+                companyIdsFilter,
+                post.postedAt.loe(now),
+                post.closeAt.gt(now),
+                post.isDeleted.eq(false)
+            )
             .orderBy(post.postedAt.desc())
             .limit(size)
             .fetch();
+    }
+
+    @Override
+    public Page<PostWithCompanyAndRole> findByFilters(
+        PostRequestDto postRequestDto,
+        Pageable pageable,
+        LocalDateTime now
+    ) {
+        List<PostWithCompanyAndRole> content = queryFactory
+            .select(Projections.constructor(
+                PostWithCompanyAndRole.class,
+                post,
+                company,
+                jobRole
+            ))
+            .from(post)
+            .join(company).on(post.companyId.eq(company.id))
+            .join(jobRole).on(post.roleId.eq(jobRole.id))
+            .where(
+                postFilter(postRequestDto, now)
+            )
+            .orderBy(
+                postOrder(postRequestDto)
+            )
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+            .select(post.count())
+            .from(post)
+            .join(company).on(post.companyId.eq(company.id))
+            .where(postFilter(postRequestDto, now));
+
+        return PageableExecutionUtils.getPage(
+            content,
+            pageable,
+            countQuery::fetchOne
+        );
+    }
+
+    @Override
+    public PostWithCompanyAndRole getByIdWithCompanyAndRole(Long postId) {
+        PostWithCompanyAndRole result = queryFactory
+            .select(Projections.constructor(
+                PostWithCompanyAndRole.class,
+                post,
+                company,
+                jobRole
+            ))
+            .from(post)
+            .join(company).on(post.companyId.eq(company.id))
+            .join(jobRole).on(post.roleId.eq(jobRole.id))
+            .where(post.id.eq(postId))
+            .fetchOne();
+
+        if (result == null) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
+
+        return result;
+    }
+
+    private Predicate postFilter(PostRequestDto dto, LocalDateTime now) {
+        BooleanExpression workTypeEq = dto.getEmploymentType() == null
+            ? null
+            : post.employmentType.eq(dto.getEmploymentType());
+
+        BooleanExpression companyNamesIn = dto.getCompanyNames() == null || dto.getCompanyNames().isEmpty()
+            ? null
+            : company.name.in(dto.getCompanyNames());
+
+        BooleanExpression postedAtLessOrEqualThanNow = post.postedAt.loe(now);
+        BooleanExpression closeAtGreaterThanNow = post.closeAt.gt(now);
+        BooleanExpression notDeleted = post.isDeleted.isFalse();
+
+        return ExpressionUtils.allOf(
+            workTypeEq,
+            companyNamesIn,
+            postedAtLessOrEqualThanNow,
+            closeAtGreaterThanNow,
+            notDeleted
+        );
+    }
+
+    private OrderSpecifier<?>[] postOrder(PostRequestDto dto) {
+        Order order = dto.getIsAscending() ? Order.ASC : Order.DESC;
+        PostSortCriteria sortCriteria = dto.getSort() != null ? dto.getSort() : PostSortCriteria.POST_AT;
+
+        OrderSpecifier<?> primaryOrder = switch (sortCriteria) {
+            case POST_AT -> new OrderSpecifier<>(order, post.postedAt);
+            case NAME -> new OrderSpecifier<>(order, company.name);
+            case LEFT_DAYS -> new OrderSpecifier<>(order, post.closeAt);
+        };
+
+        OrderSpecifier<Long> tieBreaker = new OrderSpecifier<>(order, post.id);
+
+        return new OrderSpecifier<?>[]{primaryOrder, tieBreaker};
     }
 }

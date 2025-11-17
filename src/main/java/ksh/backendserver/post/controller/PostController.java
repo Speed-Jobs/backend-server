@@ -1,19 +1,21 @@
 package ksh.backendserver.post.controller;
 
 import jakarta.validation.Valid;
+import ksh.backendserver.common.dto.request.PageRequestDto;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
-import ksh.backendserver.company.dto.response.PostSummariesResponseDto;
+import ksh.backendserver.common.dto.response.PageResponseDto;
+import ksh.backendserver.post.dto.response.PostDetailResponseDto;
+import ksh.backendserver.post.dto.response.PostSummariesResponseDto;
+import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.dto.request.PostSummaryRequestDto;
+import ksh.backendserver.post.dto.response.PostResponseDto;
 import ksh.backendserver.post.dto.response.PostSummaryResponseDto;
-import ksh.backendserver.post.model.PostSummary;
 import ksh.backendserver.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,6 +41,42 @@ public class PostController {
             HttpStatus.OK.value(),
             HttpStatus.OK.name(),
             "공고 간단 조회 성공",
+            body
+        );
+    }
+
+    @GetMapping("/api/v1/posts")
+    public ApiResponseDto<PageResponseDto> competitorPosts(
+        @Valid PostRequestDto postRequest,
+        @Valid PageRequestDto pageRequest
+    ) {
+        var page = postService.findCompetitorPosts(
+                postRequest,
+                pageRequest.toPageable()
+            )
+            .map(PostResponseDto::from);
+
+        var body = PageResponseDto.from(page);
+
+        return ApiResponseDto.of(
+            HttpStatus.OK.value(),
+            HttpStatus.OK.name(),
+            "공고 페이지 조회 성공",
+            body
+        );
+    }
+
+    @GetMapping("/api/v1/posts/{postId}")
+    public ApiResponseDto<PostDetailResponseDto> postDetail(
+        @PathVariable Long postId
+    ) {
+        var postDetail = postService.getPostDetail(postId);
+        var body = PostDetailResponseDto.from(postDetail);
+
+        return ApiResponseDto.of(
+            HttpStatus.OK.value(),
+            HttpStatus.OK.name(),
+            "경쟁사 공고 상세 조회 성공",
             body
         );
     }

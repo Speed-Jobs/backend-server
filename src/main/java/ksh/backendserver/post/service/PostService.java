@@ -1,13 +1,20 @@
 package ksh.backendserver.post.service;
 
+import ksh.backendserver.post.dto.request.PostRequestDto;
+import ksh.backendserver.post.model.PostDetail;
+import ksh.backendserver.post.model.PostInfo;
 import ksh.backendserver.post.model.PostSummary;
 import ksh.backendserver.post.repository.PostRepository;
+import ksh.backendserver.skill.repository.PostSkillRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -15,6 +22,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostSkillRepository postSkillRepository;
     private final Clock clock;
 
     @Transactional(readOnly = true)
@@ -23,10 +31,28 @@ public class PostService {
         int size
     ) {
         return postRepository
-            .findByIdInOrderByCreatedAtDesc(companyIds, size)
+            .findByIdInOrderByCreatedAtDesc(companyIds, size, LocalDateTime.now(clock))
             .stream()
             .map(post -> PostSummary.from(post, LocalDate.now(clock)))
             .toList();
 
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostInfo> findCompetitorPosts(
+        PostRequestDto dto,
+        Pageable pageable
+    ) {
+        return postRepository
+            .findByFilters(dto, pageable, LocalDateTime.now(clock))
+            .map(post -> PostInfo.from(post, LocalDate.now(clock)));
+    }
+
+    @Transactional(readOnly = true)
+    public PostDetail getPostDetail(Long postId) {
+        var postData = postRepository.getByIdWithCompanyAndRole(postId);
+        var skillNames = postSkillRepository.findSkillNamesByPostId(postId);
+
+        return PostDetail.from(postData, skillNames, LocalDate.now(clock));
     }
 }
