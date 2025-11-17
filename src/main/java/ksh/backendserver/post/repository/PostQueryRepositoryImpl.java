@@ -45,9 +45,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             ))
             .from(post)
             .join(company)
-                .on(post.companyId.eq(company.id))
+            .on(post.companyId.eq(company.id))
             .join(jobRole)
-                .on(post.roleId.eq(jobRole.id))
+            .on(post.roleId.eq(jobRole.id))
             .where(
                 companyIdsFilter,
                 post.status.eq(PostStatus.OPEN),
@@ -88,7 +88,11 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .join(company).on(post.companyId.eq(company.id))
             .where(postFilter(postRequestDto));
 
-        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+        return PageableExecutionUtils.getPage(
+            content,
+            pageable,
+            countQuery::fetchOne
+        );
     }
 
     @Override
@@ -114,12 +118,23 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     private Predicate postFilter(PostRequestDto dto) {
-        BooleanExpression workTypeEq = dto.getWorkType() == null ? null : post.workType.eq(dto.getWorkType());
-        BooleanExpression companyNamesIn = dto.getCompanyNames() == null || dto.getCompanyNames().isEmpty() ? null : company.name.in(dto.getCompanyNames());
+        BooleanExpression workTypeEq = dto.getWorkType() == null
+            ? null
+            : post.workType.eq(dto.getWorkType());
+
+        BooleanExpression companyNamesIn = dto.getCompanyNames() == null || dto.getCompanyNames().isEmpty()
+            ? null
+            : company.name.in(dto.getCompanyNames());
+
         BooleanExpression statusOpen = post.status.eq(PostStatus.OPEN);
         BooleanExpression notDeleted = post.isDeleted.isFalse();
 
-        return ExpressionUtils.allOf(workTypeEq, companyNamesIn, statusOpen, notDeleted);
+        return ExpressionUtils.allOf(
+            workTypeEq,
+            companyNamesIn,
+            statusOpen,
+            notDeleted
+        );
     }
 
     private OrderSpecifier<?>[] postOrder(PostRequestDto dto) {
