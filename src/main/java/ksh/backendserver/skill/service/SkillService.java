@@ -43,6 +43,11 @@ public class SkillService {
         return SkillCloudSnapshot.of(topSkills, topSkillStatistics);
     }
 
+    @Transactional(readOnly = true)
+    public SkillStat getDetailStat(long id,  DateRange dateRange) {
+        return aggregateTopSkillStatistics(id, dateRange);
+    }
+
     private SkillStat aggregateTopSkillStatistics(long topSkillId, DateRange dateRange) {
         LocalDateTime periodStart = LocalDateTime.now(clock)
             .minusDays(dateRange.getDuration() - 1);
