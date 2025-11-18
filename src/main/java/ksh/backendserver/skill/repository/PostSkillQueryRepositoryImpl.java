@@ -75,7 +75,7 @@ public class PostSkillQueryRepositoryImpl implements PostSkillQueryRepository {
             .join(post).on(postSkill.postId.eq(post.id))
             .where(
                 post.postedAt.goe(baseTime),
-                skill.id.eq(skill.id),
+                skill.id.eq(skillId),
                 postSkill.isDeleted.isFalse()
             )
             .fetchOne();
@@ -95,7 +95,7 @@ public class PostSkillQueryRepositoryImpl implements PostSkillQueryRepository {
             .where(
                 post.postedAt.goe(start),
                 post.postedAt.lt(endExclusive),
-                skill.id.eq(skill.id),
+                skill.id.eq(skillId),
                 postSkill.isDeleted.isFalse()
             )
             .fetchOne();
