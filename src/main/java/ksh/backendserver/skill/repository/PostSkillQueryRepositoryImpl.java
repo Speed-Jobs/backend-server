@@ -35,10 +35,10 @@ public class PostSkillQueryRepositoryImpl implements PostSkillQueryRepository {
     @Override
     public List<SkillWithCount> findTopSkillOrderByCountDesc(
         int size,
-        DateRange timePeriod,
+        DateRange dateRange,
         LocalDate end
     ) {
-        LocalDate start = end.minusDays(timePeriod.getDuration());
+        LocalDate start = end.minusDays(dateRange.getDuration());
 
         return queryFactory
             .select(Projections.constructor(

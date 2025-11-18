@@ -11,7 +11,7 @@ public interface PostSkillQueryRepository {
 
     List<String> findSkillNamesByPostId(Long postId);
 
-    List<SkillWithCount> findTopSkillOrderByCountDesc(int size, DateRange timePeriod, LocalDate end);
+    List<SkillWithCount> findTopSkillOrderByCountDesc(int size, DateRange dateRange, LocalDate end);
 
     Long countBySkillIdSince(long skillId, LocalDateTime baseTime);
 

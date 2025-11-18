@@ -26,10 +26,10 @@ public class SkillService {
     private final Clock clock;
 
     @Transactional(readOnly = true)
-    public SkillCloudSnapshot findSkillCloudsInitialSnapshot(int size, DateRange timePeriod) {
+    public SkillCloudSnapshot findSkillCloudsInitialSnapshot(int size, DateRange dateRange) {
         LocalDate today = LocalDate.now(clock);
         List<SkillCloud> topSkills = postSkillRepository
-            .findTopSkillOrderByCountDesc(size, timePeriod, today)
+            .findTopSkillOrderByCountDesc(size, dateRange, today)
             .stream()
             .map(SkillCloud::from)
             .toList();
@@ -37,15 +37,15 @@ public class SkillService {
         SkillCloud topSkill = topSkills.getFirst();
         SkillStat topSkillStatistics = aggregateTopSkillStatistics(
             topSkill.getId(),
-            timePeriod
+            dateRange
         );
 
         return SkillCloudSnapshot.of(topSkills, topSkillStatistics);
     }
 
-    private SkillStat aggregateTopSkillStatistics(long topSkillId, DateRange timePeriod) {
+    private SkillStat aggregateTopSkillStatistics(long topSkillId, DateRange dateRange) {
         LocalDateTime periodStart = LocalDateTime.now(clock)
-            .minusDays(timePeriod.getDuration() - 1);
+            .minusDays(dateRange.getDuration() - 1);
 
         long totalPostCountInPeriod = postRepository
             .countByPostedAtGreaterThanEqual(periodStart);
@@ -81,17 +81,17 @@ public class SkillService {
         return Math.round(share * 10.0) / 10.0;
     }
 
-    private double calculatePeriodChangeRate(long skillId, int periodDays) {
+    private double calculatePeriodChangeRate(long skillId, int rangeLength) {
         LocalDate today = LocalDate.now(clock);
 
         LocalDateTime previousPeriodStart = today
-            .minusDays(periodDays * 2L - 1L)
+            .minusDays(rangeLength * 2L - 1L)
             .atStartOfDay();
         LocalDateTime previousPeriodEnd = today
-            .minusDays(periodDays - 1L)
+            .minusDays(rangeLength - 1L)
             .atStartOfDay();
         LocalDateTime currentPeriodStart = today
-            .minusDays(periodDays - 1L)
+            .minusDays(rangeLength - 1L)
             .atStartOfDay();
         LocalDateTime currentPeriodEnd = LocalDateTime.now(clock);
 
