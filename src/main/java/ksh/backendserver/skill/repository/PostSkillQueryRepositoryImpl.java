@@ -82,7 +82,7 @@ public class PostSkillQueryRepositoryImpl implements PostSkillQueryRepository {
     public Long countBySkillIdBetween(
         long skillId,
         LocalDateTime start,
-        LocalDateTime end
+        LocalDateTime endExclusive
     ) {
         return queryFactory
             .select(postSkill.postId.count())
@@ -90,7 +90,8 @@ public class PostSkillQueryRepositoryImpl implements PostSkillQueryRepository {
             .join(skill).on(postSkill.skillId.eq(skill.id))
             .join(post).on(postSkill.postId.eq(post.id))
             .where(
-                post.postedAt.between(start, end),
+                post.postedAt.goe(start),
+                post.postedAt.lt(endExclusive),
                 skill.id.eq(skill.id),
                 postSkill.isDeleted.isFalse()
             )

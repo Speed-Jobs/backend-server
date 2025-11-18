@@ -15,5 +15,5 @@ public interface PostSkillQueryRepository {
 
     Long countBySkillIdSince(long skillId, LocalDateTime baseTime);
 
-    Long countBySkillIdBetween(long skillId, LocalDateTime start, LocalDateTime end);
+    Long countBySkillIdBetween(long skillId, LocalDateTime start, LocalDateTime endExclusive);
 }
