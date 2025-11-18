@@ -55,7 +55,10 @@ public class PostSkillQueryRepositoryImpl implements PostSkillQueryRepository {
                 postSkill.isDeleted.isFalse()
             )
             .groupBy(postSkill.skillId)
-            .orderBy(postSkill.skillId.desc())
+            .orderBy(
+                postSkill.skillId.count().desc(),
+                skill.name.asc()
+            )
             .limit(size)
             .fetch();
     }
