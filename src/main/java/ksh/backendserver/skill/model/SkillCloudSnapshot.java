@@ -15,4 +15,8 @@ public class SkillCloudSnapshot {
     public static SkillCloudSnapshot of(List<SkillCloud> topSkills, SkillStat topSkillStatistics) {
         return new SkillCloudSnapshot(topSkills, topSkillStatistics);
     }
+
+    public static SkillCloudSnapshot empty() {
+        return new SkillCloudSnapshot(List.of(), null);
+    }
 }

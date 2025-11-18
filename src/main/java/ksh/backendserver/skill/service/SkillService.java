@@ -34,6 +34,10 @@ public class SkillService {
             .map(SkillCloud::from)
             .toList();
 
+        if (topSkills.isEmpty()) {
+            return SkillCloudSnapshot.empty();
+        }
+
         SkillCloud topSkill = topSkills.getFirst();
         SkillStat topSkillStatistics = aggregateTopSkillStatistics(
             topSkill.getId(),
