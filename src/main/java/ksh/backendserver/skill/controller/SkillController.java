@@ -16,7 +16,7 @@ public class SkillController {
 
     private final SkillService skillService;
 
-    @GetMapping("/dashboard/skill-stat/init")
+    @GetMapping("/dashboard/skills/init")
     public ApiResponseDto<SkillCloudSnapshotResponseDto> initialSkillStat(
         @Valid SkillStatRequestDto request
     ) {
