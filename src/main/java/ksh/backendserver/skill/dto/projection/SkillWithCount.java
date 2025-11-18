@@ -9,5 +9,5 @@ import lombok.Getter;
 public class SkillWithCount {
 
     private Skill skill;
-    private int count;
+    private long count;
 }
