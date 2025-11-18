@@ -20,7 +20,7 @@ public class SkillController {
 
     private final SkillService skillService;
 
-    @GetMapping("/dashboard/skills/init")
+    @GetMapping("/api/v1/dashboard/skills/init")
     public ApiResponseDto<SkillCloudSnapshotResponseDto> initialSkillStat(
         @Valid SkillStatRequestDto request
     ) {
@@ -39,7 +39,7 @@ public class SkillController {
         );
     }
 
-    @GetMapping("/dashboard/skills/{id}")
+    @GetMapping("/api/v1/dashboard/skills/{id}")
     public ApiResponseDto<SkillStatResponseDto> skillStat(
         @PathVariable("id") long id,
         @RequestParam(defaultValue = "MONTHLY") DateRange dateRange
