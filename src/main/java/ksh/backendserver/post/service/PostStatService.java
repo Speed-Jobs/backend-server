@@ -1,7 +1,6 @@
 package ksh.backendserver.post.service;
 
 import ksh.backendserver.company.enums.DateRange;
-import ksh.backendserver.group.enums.GroupCategory;
 import ksh.backendserver.post.dto.projection.GroupCountProjection;
 import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
 import ksh.backendserver.post.model.GroupShare;
@@ -57,7 +56,7 @@ public class PostStatService {
     }
 
     @Transactional(readOnly = true)
-    public List<GroupShare> findJobGroupDistribution(
+    public List<GroupShare> findPostDistributionByJobGroup(
         GroupShareStatRequestDto request
     ) {
         LocalDateTime now = LocalDateTime.now(clock);

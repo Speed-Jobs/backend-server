@@ -3,7 +3,6 @@ package ksh.backendserver.post.controller;
 import jakarta.validation.Valid;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
 import ksh.backendserver.company.enums.DateRange;
-import ksh.backendserver.group.enums.GroupCategory;
 import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
 import ksh.backendserver.post.dto.response.GroupShareResponseDto;
 import ksh.backendserver.post.dto.response.GroupSharesResponseDto;
@@ -65,7 +64,7 @@ public class PostStatController {
     public ApiResponseDto<GroupSharesResponseDto> distributionByJobGroup(
         @Valid GroupShareStatRequestDto request
         ) {
-        var distributions = postStatService.findJobGroupDistribution(request)
+        var distributions = postStatService.findPostDistributionByJobGroup(request)
             .stream()
             .map(GroupShareResponseDto::from)
             .toList();
