@@ -1,4 +1,4 @@
-package ksh.backendserver.skill.service;
+package ksh.backendserver.post.service;
 
 import ksh.backendserver.company.enums.DateRange;
 import ksh.backendserver.post.repository.PostRepository;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SkillService {
+public class PostStatService {
 
     private static final double CHANGE_RATE_UNAVAILABLE = -1.0;
 

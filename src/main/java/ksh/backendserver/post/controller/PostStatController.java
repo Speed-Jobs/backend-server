@@ -1,12 +1,12 @@
-package ksh.backendserver.skill.controller;
+package ksh.backendserver.post.controller;
 
 import jakarta.validation.Valid;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
 import ksh.backendserver.company.enums.DateRange;
+import ksh.backendserver.post.service.PostStatService;
 import ksh.backendserver.skill.dto.request.SkillStatRequestDto;
 import ksh.backendserver.skill.dto.response.SkillCloudSnapshotResponseDto;
 import ksh.backendserver.skill.dto.response.SkillStatResponseDto;
-import ksh.backendserver.skill.service.SkillService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,15 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class SkillController {
+public class PostStatController {
 
-    private final SkillService skillService;
+    private final PostStatService postStatService;
 
     @GetMapping("/api/v1/dashboard/skills/init")
     public ApiResponseDto<SkillCloudSnapshotResponseDto> initialSkillStat(
         @Valid SkillStatRequestDto request
     ) {
-        var snapshot = skillService.findSkillCloudsInitialSnapshot(
+        var snapshot = postStatService.findSkillCloudsInitialSnapshot(
             request.getSize(),
             request.getDateRange()
         );
@@ -44,7 +44,7 @@ public class SkillController {
         @PathVariable("id") long id,
         @RequestParam(defaultValue = "MONTHLY") DateRange dateRange
     ) {
-        var stat = skillService.getDetailStat(id, dateRange);
+        var stat = postStatService.getDetailStat(id, dateRange);
 
         var body = SkillStatResponseDto.from(stat);
 
