@@ -41,5 +41,8 @@ public class Company extends BaseEntity {
     private String logoUrl;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isCompetitor;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isDeleted;
 }
