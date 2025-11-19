@@ -1,0 +1,30 @@
+package ksh.backendserver.skill.dto.response;
+
+import ksh.backendserver.skill.model.SkillStat;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class SkillStatResponseDto {
+
+    private long count;
+    private double marketShare;
+    private double weeklyChangeRate;
+    private double monthlyChangeRate;
+
+    public static SkillStatResponseDto from(SkillStat skillStat) {
+        if(skillStat == null) {
+            return new SkillStatResponseDto();
+        }
+
+        return new SkillStatResponseDto(
+            skillStat.getCountInPeriod(),
+            skillStat.getMarketShare(),
+            skillStat.getWeeklyChangeRate(),
+            skillStat.getMonthlyChangeRate()
+        );
+    }
+}
