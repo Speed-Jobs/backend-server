@@ -7,7 +7,11 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import ksh.backendserver.common.exception.CustomException;
 import ksh.backendserver.common.exception.ErrorCode;
+import ksh.backendserver.company.enums.DateRange;
+import ksh.backendserver.group.enums.GroupCategory;
+import ksh.backendserver.post.dto.projection.GroupCountProjection;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
+import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.enums.PostSortCriteria;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static ksh.backendserver.company.entity.QCompany.company;
+import static ksh.backendserver.group.entity.QJobGroup.jobGroup;
 import static ksh.backendserver.post.entity.QPost.post;
 import static ksh.backendserver.role.entity.QJobRole.jobRole;
 
@@ -77,7 +82,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .join(company).on(post.companyId.eq(company.id))
             .join(jobRole).on(post.roleId.eq(jobRole.id))
             .where(
-                postFilter(postRequestDto, now)
+                postSearchFilter(postRequestDto, now)
             )
             .orderBy(
                 postOrder(postRequestDto)
@@ -89,7 +94,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .select(post.count())
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .where(postFilter(postRequestDto, now));
+            .where(postSearchFilter(postRequestDto, now));
 
         return PageableExecutionUtils.getPage(
             content,
@@ -120,7 +125,33 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return result;
     }
 
-    private Predicate postFilter(PostRequestDto dto, LocalDateTime now) {
+    @Override
+    public List<GroupCountProjection> aggregateByGroupCategoryGroupByRole(
+        GroupShareStatRequestDto request,
+        LocalDateTime end
+    ) {
+
+
+        return queryFactory
+            .select(Projections.constructor(
+                GroupCountProjection.class,
+                jobRole.id,
+                jobRole.name,
+                post.id.count()
+            ))
+            .from(post)
+            .join(company).on(post.companyId.eq(company.id))
+            .join(jobRole).on(post.roleId.eq(jobRole.id))
+            .join(jobGroup).on(jobRole.fieldId.eq(jobGroup.id))
+            .where(
+                groupShareFilter(request, end)
+            )
+            .groupBy(jobRole.name)
+            .fetch();
+
+    }
+
+    private Predicate postSearchFilter(PostRequestDto dto, LocalDateTime now) {
         BooleanExpression workTypeEq = dto.getEmploymentType() == null
             ? null
             : post.employmentType.eq(dto.getEmploymentType());
@@ -155,5 +186,30 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         OrderSpecifier<Long> tieBreaker = new OrderSpecifier<>(order, post.id);
 
         return new OrderSpecifier<?>[]{primaryOrder, tieBreaker};
+    }
+
+    private Predicate groupShareFilter(GroupShareStatRequestDto request, LocalDateTime end) {
+
+        BooleanExpression postScope = switch (request.getScope()) {
+            case ALL -> null;
+            case COMPETITORS -> company.isCompetitor.isTrue();
+            case SINGLE -> company.name.eq(request.getCompanyName());
+        };
+
+        DateRange dateRange = request.getDateRange();
+        LocalDateTime start = end.minusDays(dateRange.getDuration());
+        BooleanExpression postedInRange = post.postedAt.goe(start).and(post.postedAt.lt(end));
+
+        GroupCategory groupCategory = request.getGroupCategory();
+        BooleanExpression groupCategoryEquals = jobGroup.category.eq(groupCategory);
+
+        BooleanExpression notDeleted = post.isDeleted.isFalse();
+
+        return ExpressionUtils.allOf(
+            postScope,
+            postedInRange,
+            groupCategoryEquals,
+            notDeleted
+        );
     }
 }
