@@ -1,6 +1,10 @@
 package ksh.backendserver.post.service;
 
 import ksh.backendserver.company.enums.DateRange;
+import ksh.backendserver.group.enums.GroupCategory;
+import ksh.backendserver.post.dto.projection.GroupCountProjection;
+import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
+import ksh.backendserver.post.model.GroupShare;
 import ksh.backendserver.post.repository.PostRepository;
 import ksh.backendserver.skill.model.SkillCloud;
 import ksh.backendserver.skill.model.SkillCloudSnapshot;
@@ -48,8 +52,27 @@ public class PostStatService {
     }
 
     @Transactional(readOnly = true)
-    public SkillStat getDetailStat(long id,  DateRange dateRange) {
+    public SkillStat getDetailStat(long id, DateRange dateRange) {
         return aggregateTopSkillStatistics(id, dateRange);
+    }
+
+    @Transactional(readOnly = true)
+    public List<GroupShare> findJobGroupDistribution(
+        GroupShareStatRequestDto request
+    ) {
+        LocalDateTime now = LocalDateTime.now(clock);
+        List<GroupCountProjection> projections =
+            postRepository.aggregateByGroupCategoryGroupByRole(
+                request,
+                now
+            );
+
+        long totalPostCount = postRepository.countByPostedAtGreaterThanEqual(now);
+
+        return projections
+            .stream()
+            .map(projection -> GroupShare.from(projection, totalPostCount))
+            .toList();
     }
 
     private SkillStat aggregateTopSkillStatistics(long topSkillId, DateRange dateRange) {
