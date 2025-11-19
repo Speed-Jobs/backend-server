@@ -2,6 +2,7 @@ package ksh.backendserver.group.entity;
 
 import jakarta.persistence.*;
 import ksh.backendserver.BaseEntity;
+import ksh.backendserver.group.enums.GroupCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +26,9 @@ public class JobGroup extends BaseEntity {
     private String name;
 
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private GroupCategory category;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isDeleted;
