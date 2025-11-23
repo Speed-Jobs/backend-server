@@ -11,10 +11,10 @@ import ksh.backendserver.company.enums.DateRange;
 import ksh.backendserver.group.enums.JobFieldCategory;
 import ksh.backendserver.post.dto.projection.JobFieldCountProjection;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
-import ksh.backendserver.post.dto.projection.RoleCountProjection;
+import ksh.backendserver.post.dto.projection.JobRoleCountProjection;
 import ksh.backendserver.post.dto.request.JobFieldShareStatRequestDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
-import ksh.backendserver.post.dto.request.RoleShareStatRequestDto;
+import ksh.backendserver.post.dto.request.JobRoleShareStatRequestDto;
 import ksh.backendserver.post.enums.PostSortCriteria;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -152,14 +152,14 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public List<RoleCountProjection> countByRoleFilteredByFieldId(
-        RoleShareStatRequestDto request,
+    public List<JobRoleCountProjection> countByRoleFilteredByFieldId(
+        JobRoleShareStatRequestDto request,
         long groupId,
         LocalDateTime end
     ) {
         return queryFactory
             .select(Projections.constructor(
-                RoleCountProjection.class,
+                JobRoleCountProjection.class,
                 jobRole.id,
                 jobRole.name,
                 post.id.count()
@@ -236,7 +236,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         );
     }
 
-    private Predicate roleShareFilter(RoleShareStatRequestDto request, long groupId, LocalDateTime end) {
+    private Predicate roleShareFilter(JobRoleShareStatRequestDto request, long groupId, LocalDateTime end) {
 
         BooleanExpression postScope = switch (request.getScope()) {
             case ALL -> null;

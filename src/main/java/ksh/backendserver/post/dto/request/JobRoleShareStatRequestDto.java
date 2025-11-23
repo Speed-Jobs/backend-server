@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class RoleShareStatRequestDto {
+public class JobRoleShareStatRequestDto {
 
     @NotNull(message = "공고 조회 범위는 필수입니다.")
     private PostScope scope;

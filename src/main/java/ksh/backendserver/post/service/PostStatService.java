@@ -2,11 +2,11 @@ package ksh.backendserver.post.service;
 
 import ksh.backendserver.company.enums.DateRange;
 import ksh.backendserver.post.dto.projection.JobFieldCountProjection;
-import ksh.backendserver.post.dto.projection.RoleCountProjection;
+import ksh.backendserver.post.dto.projection.JobRoleCountProjection;
 import ksh.backendserver.post.dto.request.JobFieldShareStatRequestDto;
-import ksh.backendserver.post.dto.request.RoleShareStatRequestDto;
+import ksh.backendserver.post.dto.request.JobRoleShareStatRequestDto;
 import ksh.backendserver.post.model.JobFieldShare;
-import ksh.backendserver.post.model.RoleShare;
+import ksh.backendserver.post.model.JobRoleShare;
 import ksh.backendserver.post.repository.PostRepository;
 import ksh.backendserver.skill.model.SkillCloud;
 import ksh.backendserver.skill.model.SkillCloudSnapshot;
@@ -81,12 +81,12 @@ public class PostStatService {
     }
 
     @Transactional(readOnly = true)
-    public List<RoleShare> findPostDistributionByJobRoleOfGroup(
-        RoleShareStatRequestDto request,
+    public List<JobRoleShare> findPostDistributionByJobRoleOfGroup(
+        JobRoleShareStatRequestDto request,
         long groupId
     ) {
         LocalDateTime now = LocalDateTime.now(clock);
-        List<RoleCountProjection> projections =
+        List<JobRoleCountProjection> projections =
             postRepository.countByRoleFilteredByFieldId(
                 request,
                 groupId,
@@ -95,12 +95,12 @@ public class PostStatService {
 
         long totalPostCount = projections
             .stream()
-            .mapToLong(RoleCountProjection::getPostCount)
+            .mapToLong(JobRoleCountProjection::getPostCount)
             .sum();
 
         return projections
             .stream()
-            .map(projection -> RoleShare.from(projection, totalPostCount))
+            .map(projection -> JobRoleShare.from(projection, totalPostCount))
             .toList();
     }
 
