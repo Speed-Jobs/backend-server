@@ -64,7 +64,7 @@ public class PostStatService {
     ) {
         LocalDateTime now = LocalDateTime.now(clock);
         List<GroupCountProjection> projections =
-            postRepository.aggregateByGroupCategoryGroupByRole(
+            postRepository.countByFieldFilteredByFieldCategory(
                 request,
                 now
             );
@@ -85,7 +85,7 @@ public class PostStatService {
     ) {
         LocalDateTime now = LocalDateTime.now(clock);
         List<RoleCountProjection> projections =
-            postRepository.aggregateByGroupIdGroupByRole(
+            postRepository.countByRoleFilteredByFieldId(
                 request,
                 groupId,
                 now

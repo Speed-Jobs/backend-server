@@ -129,7 +129,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     //TODO: Group id를 반환해야 함 직군과 직무를 착각하지 마라
     @Override
-    public List<GroupCountProjection> aggregateByGroupCategoryGroupByRole(
+    public List<GroupCountProjection> countByFieldFilteredByFieldCategory(
         GroupShareStatRequestDto request,
         LocalDateTime end
     ) {
@@ -153,7 +153,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public List<RoleCountProjection> aggregateByGroupIdGroupByRole(
+    public List<RoleCountProjection> countByRoleFilteredByFieldId(
         RoleShareStatRequestDto request,
         long groupId,
         LocalDateTime end

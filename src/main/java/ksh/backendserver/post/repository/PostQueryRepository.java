@@ -19,9 +19,8 @@ public interface PostQueryRepository {
     Page<PostWithCompanyAndRole> findByFilters(PostRequestDto postRequestDto, Pageable pageable, LocalDateTime now);
 
     PostWithCompanyAndRole getByIdWithCompanyAndRole(Long postId);
+    
+    List<GroupCountProjection> countByFieldFilteredByFieldCategory(GroupShareStatRequestDto request, LocalDateTime end);
 
-    //TODO: 메소드 이름 변경, 집계는 Role이 아니라 Group을 기준으로임
-    List<GroupCountProjection> aggregateByGroupCategoryGroupByRole(GroupShareStatRequestDto request, LocalDateTime end);
-
-    List<RoleCountProjection> aggregateByGroupIdGroupByRole(RoleShareStatRequestDto request, long groupId, LocalDateTime end);
+    List<RoleCountProjection> countByRoleFilteredByFieldId(RoleShareStatRequestDto request, long groupId, LocalDateTime end);
 }
