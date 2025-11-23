@@ -67,7 +67,7 @@ public class PostStatController {
     public ApiResponseDto<JobFieldSharesResponseDto> distributionByJobGroup(
         @Valid JobFieldShareStatRequestDto request
     ) {
-        var distributions = postStatService.findPostDistributionByJobGroup(request)
+        var distributions = postStatService.findPostDistributionByJobField(request)
             .stream()
             .map(JobFieldShareResponseDto::from)
             .toList();
@@ -88,7 +88,7 @@ public class PostStatController {
         @Valid JobRoleShareStatRequestDto request,
         @PathVariable("groupId") long groupId
     ) {
-        var dtos = postStatService.findPostDistributionByJobRoleOfGroup(
+        var dtos = postStatService.findPostDistributionByJobRoleOfField(
                 request,
                 groupId
             )

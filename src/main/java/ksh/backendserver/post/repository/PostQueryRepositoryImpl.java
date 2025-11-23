@@ -154,7 +154,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     @Override
     public List<JobRoleCountProjection> countByRoleFilteredByFieldId(
         JobRoleShareStatRequestDto request,
-        long groupId,
+        long fieldId,
         LocalDateTime end
     ) {
         return queryFactory
@@ -168,7 +168,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .join(company).on(post.companyId.eq(company.id))
             .join(jobRole).on(post.roleId.eq(jobRole.id))
             .where(
-                roleShareFilter(request, groupId, end)
+                roleShareFilter(request, fieldId, end)
             )
             .groupBy(jobRole.name)
             .fetch();
@@ -236,7 +236,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         );
     }
 
-    private Predicate roleShareFilter(JobRoleShareStatRequestDto request, long groupId, LocalDateTime end) {
+    private Predicate roleShareFilter(JobRoleShareStatRequestDto request, long fieldId, LocalDateTime end) {
 
         BooleanExpression postScope = switch (request.getScope()) {
             case ALL -> null;
@@ -248,14 +248,14 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         LocalDateTime start = end.minusDays(dateRange.getDuration());
         BooleanExpression postedInRange = post.postedAt.goe(start).and(post.postedAt.lt(end));
 
-        BooleanExpression groupIdEquals = jobRole.fieldId.eq(groupId);
+        BooleanExpression fieldIdEquals = jobRole.fieldId.eq(fieldId);
 
         BooleanExpression notDeleted = post.isDeleted.isFalse();
 
         return ExpressionUtils.allOf(
             postScope,
             postedInRange,
-            groupIdEquals,
+            fieldIdEquals,
             notDeleted
         );
     }

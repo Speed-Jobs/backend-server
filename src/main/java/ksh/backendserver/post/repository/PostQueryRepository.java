@@ -22,5 +22,5 @@ public interface PostQueryRepository {
     
     List<JobFieldCountProjection> countByFieldFilteredByFieldCategory(JobFieldShareStatRequestDto request, LocalDateTime end);
 
-    List<JobRoleCountProjection> countByRoleFilteredByFieldId(JobRoleShareStatRequestDto request, long groupId, LocalDateTime end);
+    List<JobRoleCountProjection> countByRoleFilteredByFieldId(JobRoleShareStatRequestDto request, long fieldId, LocalDateTime end);
 }

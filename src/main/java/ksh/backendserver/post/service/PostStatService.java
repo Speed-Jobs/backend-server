@@ -83,13 +83,13 @@ public class PostStatService {
     @Transactional(readOnly = true)
     public List<JobRoleShare> findPostDistributionByJobRoleOfField(
         JobRoleShareStatRequestDto request,
-        long groupId
+        long fieldId
     ) {
         LocalDateTime now = LocalDateTime.now(clock);
         List<JobRoleCountProjection> projections =
             postRepository.countByRoleFilteredByFieldId(
                 request,
-                groupId,
+                fieldId,
                 now
             );
 
