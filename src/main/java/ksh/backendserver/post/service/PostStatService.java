@@ -2,8 +2,11 @@ package ksh.backendserver.post.service;
 
 import ksh.backendserver.company.enums.DateRange;
 import ksh.backendserver.post.dto.projection.GroupCountProjection;
+import ksh.backendserver.post.dto.projection.RoleCountProjection;
 import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
+import ksh.backendserver.post.dto.request.RoleShareStatRequestDto;
 import ksh.backendserver.post.model.GroupShare;
+import ksh.backendserver.post.model.RoleShare;
 import ksh.backendserver.post.repository.PostRepository;
 import ksh.backendserver.skill.model.SkillCloud;
 import ksh.backendserver.skill.model.SkillCloudSnapshot;
@@ -66,11 +69,36 @@ public class PostStatService {
                 now
             );
 
+        //TODO: 이거 전체 공고도 다시 짜야할듯 그냥 조회된 projection 리스트에서 count를 모두 더하자
         long totalPostCount = postRepository.countByPostedAtGreaterThanEqual(now);
 
         return projections
             .stream()
             .map(projection -> GroupShare.from(projection, totalPostCount))
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<RoleShare> findPostDistributionByJobRoleOfGroup(
+        RoleShareStatRequestDto request,
+        long groupId
+    ) {
+        LocalDateTime now = LocalDateTime.now(clock);
+        List<RoleCountProjection> projections =
+            postRepository.aggregateByGroupIdGroupByRole(
+                request,
+                groupId,
+                now
+            );
+
+        long totalPostCount = projections
+            .stream()
+            .mapToLong(RoleCountProjection::getPostCount)
+            .sum();
+
+        return projections
+            .stream()
+            .map(projection -> RoleShare.from(projection, totalPostCount))
             .toList();
     }
 
