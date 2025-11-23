@@ -1,11 +1,11 @@
 package ksh.backendserver.post.service;
 
 import ksh.backendserver.company.enums.DateRange;
-import ksh.backendserver.post.dto.projection.GroupCountProjection;
+import ksh.backendserver.post.dto.projection.JobFieldCountProjection;
 import ksh.backendserver.post.dto.projection.RoleCountProjection;
-import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
+import ksh.backendserver.post.dto.request.JobFieldShareStatRequestDto;
 import ksh.backendserver.post.dto.request.RoleShareStatRequestDto;
-import ksh.backendserver.post.model.GroupShare;
+import ksh.backendserver.post.model.JobFieldShare;
 import ksh.backendserver.post.model.RoleShare;
 import ksh.backendserver.post.repository.PostRepository;
 import ksh.backendserver.skill.model.SkillCloud;
@@ -59,11 +59,11 @@ public class PostStatService {
     }
 
     @Transactional(readOnly = true)
-    public List<GroupShare> findPostDistributionByJobGroup(
-        GroupShareStatRequestDto request
+    public List<JobFieldShare> findPostDistributionByJobGroup(
+        JobFieldShareStatRequestDto request
     ) {
         LocalDateTime now = LocalDateTime.now(clock);
-        List<GroupCountProjection> projections =
+        List<JobFieldCountProjection> projections =
             postRepository.countByFieldFilteredByFieldCategory(
                 request,
                 now
@@ -71,12 +71,12 @@ public class PostStatService {
 
         long totalPostCount = projections
             .stream()
-            .mapToLong(GroupCountProjection::getPostCount)
+            .mapToLong(JobFieldCountProjection::getPostCount)
             .sum();
 
         return projections
             .stream()
-            .map(projection -> GroupShare.from(projection, totalPostCount))
+            .map(projection -> JobFieldShare.from(projection, totalPostCount))
             .toList();
     }
 

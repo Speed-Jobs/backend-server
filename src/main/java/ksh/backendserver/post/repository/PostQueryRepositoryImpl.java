@@ -9,10 +9,10 @@ import ksh.backendserver.common.exception.CustomException;
 import ksh.backendserver.common.exception.ErrorCode;
 import ksh.backendserver.company.enums.DateRange;
 import ksh.backendserver.group.enums.JobFieldCategory;
-import ksh.backendserver.post.dto.projection.GroupCountProjection;
+import ksh.backendserver.post.dto.projection.JobFieldCountProjection;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
 import ksh.backendserver.post.dto.projection.RoleCountProjection;
-import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
+import ksh.backendserver.post.dto.request.JobFieldShareStatRequestDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.dto.request.RoleShareStatRequestDto;
 import ksh.backendserver.post.enums.PostSortCriteria;
@@ -128,13 +128,13 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
     
     @Override
-    public List<GroupCountProjection> countByFieldFilteredByFieldCategory(
-        GroupShareStatRequestDto request,
+    public List<JobFieldCountProjection> countByFieldFilteredByFieldCategory(
+        JobFieldShareStatRequestDto request,
         LocalDateTime end
     ) {
         return queryFactory
             .select(Projections.constructor(
-                GroupCountProjection.class,
+                JobFieldCountProjection.class,
                 jobField.id,
                 jobField.name,
                 post.id.count()
@@ -211,7 +211,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return new OrderSpecifier<?>[]{primaryOrder, tieBreaker};
     }
 
-    private Predicate groupShareFilter(GroupShareStatRequestDto request, LocalDateTime end) {
+    private Predicate groupShareFilter(JobFieldShareStatRequestDto request, LocalDateTime end) {
 
         BooleanExpression postScope = switch (request.getScope()) {
             case ALL -> null;

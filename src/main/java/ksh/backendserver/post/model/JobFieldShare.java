@@ -1,22 +1,22 @@
 package ksh.backendserver.post.model;
 
-import ksh.backendserver.post.dto.projection.GroupCountProjection;
+import ksh.backendserver.post.dto.projection.JobFieldCountProjection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class GroupShare {
+public class JobFieldShare {
 
     private long fieldId;
     private String fieldName;
     private double share;
 
-    public static GroupShare from(GroupCountProjection projection, long totalPostCount) {
+    public static JobFieldShare from(JobFieldCountProjection projection, long totalPostCount) {
         double share = (double) projection.getPostCount() / totalPostCount * 100;
         double roundedShare = Math.round(share * 10) / 10.0;
 
-        return new GroupShare(
+        return new JobFieldShare(
             projection.getFieldId(),
             projection.getFieldName(),
             roundedShare

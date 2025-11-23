@@ -3,10 +3,10 @@ package ksh.backendserver.post.controller;
 import jakarta.validation.Valid;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
 import ksh.backendserver.company.enums.DateRange;
-import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
+import ksh.backendserver.post.dto.request.JobFieldShareStatRequestDto;
 import ksh.backendserver.post.dto.request.RoleShareStatRequestDto;
-import ksh.backendserver.post.dto.response.GroupShareResponseDto;
-import ksh.backendserver.post.dto.response.GroupSharesResponseDto;
+import ksh.backendserver.post.dto.response.JobFieldShareResponseDto;
+import ksh.backendserver.post.dto.response.JobFieldSharesResponseDto;
 import ksh.backendserver.post.dto.response.RoleShareResponseDto;
 import ksh.backendserver.post.dto.response.RoleSharesResponseDto;
 import ksh.backendserver.post.service.PostStatService;
@@ -64,16 +64,16 @@ public class PostStatController {
 
     //TODO: RequestParam 기본값 잘 동작하는지 테스트
     @GetMapping("/api/v1/dashboard/job-group")
-    public ApiResponseDto<GroupSharesResponseDto> distributionByJobGroup(
-        @Valid GroupShareStatRequestDto request
+    public ApiResponseDto<JobFieldSharesResponseDto> distributionByJobGroup(
+        @Valid JobFieldShareStatRequestDto request
     ) {
         var distributions = postStatService.findPostDistributionByJobGroup(request)
             .stream()
-            .map(GroupShareResponseDto::from)
+            .map(JobFieldShareResponseDto::from)
             .toList();
 
         //TODO: 여기 of로 바꾸기
-        var body = GroupSharesResponseDto.of(distributions);
+        var body = JobFieldSharesResponseDto.of(distributions);
 
         return ApiResponseDto.of(
             HttpStatus.OK.value(),
