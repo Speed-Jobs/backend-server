@@ -1,6 +1,12 @@
 package ksh.backendserver.post.service;
 
 import ksh.backendserver.company.enums.DateRange;
+import ksh.backendserver.post.dto.projection.GroupCountProjection;
+import ksh.backendserver.post.dto.projection.RoleCountProjection;
+import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
+import ksh.backendserver.post.dto.request.RoleShareStatRequestDto;
+import ksh.backendserver.post.model.GroupShare;
+import ksh.backendserver.post.model.RoleShare;
 import ksh.backendserver.post.repository.PostRepository;
 import ksh.backendserver.skill.model.SkillCloud;
 import ksh.backendserver.skill.model.SkillCloudSnapshot;
@@ -48,8 +54,54 @@ public class PostStatService {
     }
 
     @Transactional(readOnly = true)
-    public SkillStat getDetailStat(long id,  DateRange dateRange) {
+    public SkillStat getDetailStat(long id, DateRange dateRange) {
         return aggregateTopSkillStatistics(id, dateRange);
+    }
+
+    @Transactional(readOnly = true)
+    public List<GroupShare> findPostDistributionByJobGroup(
+        GroupShareStatRequestDto request
+    ) {
+        LocalDateTime now = LocalDateTime.now(clock);
+        List<GroupCountProjection> projections =
+            postRepository.countByFieldFilteredByFieldCategory(
+                request,
+                now
+            );
+
+        long totalPostCount = projections
+            .stream()
+            .mapToLong(GroupCountProjection::getPostCount)
+            .sum();
+
+        return projections
+            .stream()
+            .map(projection -> GroupShare.from(projection, totalPostCount))
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<RoleShare> findPostDistributionByJobRoleOfGroup(
+        RoleShareStatRequestDto request,
+        long groupId
+    ) {
+        LocalDateTime now = LocalDateTime.now(clock);
+        List<RoleCountProjection> projections =
+            postRepository.countByRoleFilteredByFieldId(
+                request,
+                groupId,
+                now
+            );
+
+        long totalPostCount = projections
+            .stream()
+            .mapToLong(RoleCountProjection::getPostCount)
+            .sum();
+
+        return projections
+            .stream()
+            .map(projection -> RoleShare.from(projection, totalPostCount))
+            .toList();
     }
 
     private SkillStat aggregateTopSkillStatistics(long topSkillId, DateRange dateRange) {

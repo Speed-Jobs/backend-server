@@ -1,7 +1,11 @@
 package ksh.backendserver.post.repository;
 
+import ksh.backendserver.post.dto.projection.GroupCountProjection;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
+import ksh.backendserver.post.dto.projection.RoleCountProjection;
+import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
+import ksh.backendserver.post.dto.request.RoleShareStatRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,4 +19,8 @@ public interface PostQueryRepository {
     Page<PostWithCompanyAndRole> findByFilters(PostRequestDto postRequestDto, Pageable pageable, LocalDateTime now);
 
     PostWithCompanyAndRole getByIdWithCompanyAndRole(Long postId);
+    
+    List<GroupCountProjection> countByFieldFilteredByFieldCategory(GroupShareStatRequestDto request, LocalDateTime end);
+
+    List<RoleCountProjection> countByRoleFilteredByFieldId(RoleShareStatRequestDto request, long groupId, LocalDateTime end);
 }
