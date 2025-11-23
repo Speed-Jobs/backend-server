@@ -8,7 +8,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import ksh.backendserver.common.exception.CustomException;
 import ksh.backendserver.common.exception.ErrorCode;
 import ksh.backendserver.company.enums.DateRange;
-import ksh.backendserver.group.enums.GroupCategory;
+import ksh.backendserver.group.enums.JobFieldCategory;
 import ksh.backendserver.post.dto.projection.GroupCountProjection;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
 import ksh.backendserver.post.dto.projection.RoleCountProjection;
@@ -223,7 +223,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         LocalDateTime start = end.minusDays(dateRange.getDuration());
         BooleanExpression postedInRange = post.postedAt.goe(start).and(post.postedAt.lt(end));
 
-        GroupCategory groupCategory = request.getGroupCategory();
+        JobFieldCategory groupCategory = request.getGroupCategory();
         BooleanExpression groupCategoryEquals = jobGroup.category.eq(groupCategory);
 
         BooleanExpression notDeleted = post.isDeleted.isFalse();

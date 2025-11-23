@@ -1,6 +1,6 @@
 package ksh.backendserver.group.enums;
 
-public enum GroupCategory {
+public enum JobFieldCategory {
 
     TECH,
     BIZ,

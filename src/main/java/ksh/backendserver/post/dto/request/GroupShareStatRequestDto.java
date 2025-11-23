@@ -2,7 +2,7 @@ package ksh.backendserver.post.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import ksh.backendserver.company.enums.DateRange;
-import ksh.backendserver.group.enums.GroupCategory;
+import ksh.backendserver.group.enums.JobFieldCategory;
 import ksh.backendserver.post.enums.PostScope;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +17,7 @@ public class GroupShareStatRequestDto {
     private String companyName;
 
     @NotNull(message = "직군 카테고리는 필수입니다.")
-    private GroupCategory groupCategory;
+    private JobFieldCategory groupCategory;
 
     @NotNull(message = "조회 기간은 필수입니다.")
     private DateRange dateRange;
