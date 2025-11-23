@@ -59,7 +59,7 @@ public class PostStatService {
     }
 
     @Transactional(readOnly = true)
-    public List<JobFieldShare> findPostDistributionByJobGroup(
+    public List<JobFieldShare> findPostDistributionByJobField(
         JobFieldShareStatRequestDto request
     ) {
         LocalDateTime now = LocalDateTime.now(clock);
@@ -81,7 +81,7 @@ public class PostStatService {
     }
 
     @Transactional(readOnly = true)
-    public List<JobRoleShare> findPostDistributionByJobRoleOfGroup(
+    public List<JobRoleShare> findPostDistributionByJobRoleOfField(
         JobRoleShareStatRequestDto request,
         long groupId
     ) {
