@@ -69,8 +69,10 @@ public class PostStatService {
                 now
             );
 
-        //TODO: 이거 전체 공고도 다시 짜야할듯 그냥 조회된 projection 리스트에서 count를 모두 더하자
-        long totalPostCount = postRepository.countByPostedAtGreaterThanEqual(now);
+        long totalPostCount = projections
+            .stream()
+            .mapToLong(GroupCountProjection::getPostCount)
+            .sum();
 
         return projections
             .stream()
