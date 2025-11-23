@@ -14,7 +14,7 @@ public class GroupSharesResponseDto {
     private List<GroupShareResponseDto> distributions;
 
 
-    public static GroupSharesResponseDto from(List<GroupShareResponseDto> dtos) {
+    public static GroupSharesResponseDto of(List<GroupShareResponseDto> dtos) {
         return new GroupSharesResponseDto(dtos);
     }
 

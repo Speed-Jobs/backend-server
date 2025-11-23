@@ -73,7 +73,7 @@ public class PostStatController {
             .toList();
 
         //TODO: 여기 of로 바꾸기
-        var body = GroupSharesResponseDto.from(distributions);
+        var body = GroupSharesResponseDto.of(distributions);
 
         return ApiResponseDto.of(
             HttpStatus.OK.value(),
