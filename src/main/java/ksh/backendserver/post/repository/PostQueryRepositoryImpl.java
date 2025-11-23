@@ -126,8 +126,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         return result;
     }
-
-    //TODO: Group id를 반환해야 함 직군과 직무를 착각하지 마라
+    
     @Override
     public List<GroupCountProjection> countByFieldFilteredByFieldCategory(
         GroupShareStatRequestDto request,
@@ -136,8 +135,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return queryFactory
             .select(Projections.constructor(
                 GroupCountProjection.class,
-                jobRole.id,
-                jobRole.name,
+                jobGroup.id,
+                jobGroup.name,
                 post.id.count()
             ))
             .from(post)
@@ -147,7 +146,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .where(
                 groupShareFilter(request, end)
             )
-            .groupBy(jobRole.name)
+            .groupBy(jobGroup.name)
             .fetch();
 
     }
