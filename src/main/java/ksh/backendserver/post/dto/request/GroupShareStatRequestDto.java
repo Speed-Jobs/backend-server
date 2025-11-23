@@ -17,7 +17,7 @@ public class GroupShareStatRequestDto {
     private String companyName;
 
     @NotNull(message = "직군 카테고리는 필수입니다.")
-    private JobFieldCategory groupCategory;
+    private JobFieldCategory fieldCategory;
 
     @NotNull(message = "조회 기간은 필수입니다.")
     private DateRange dateRange;

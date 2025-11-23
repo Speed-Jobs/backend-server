@@ -9,11 +9,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public class GroupShareResponseDto {
 
-    private long groupId;
-    private String groupName;
+    private long fieldId;
+    private String fieldName;
     private double share;
 
     public static GroupShareResponseDto from(GroupShare model) {
-        return new GroupShareResponseDto(model.getGroupId(), model.getGroupName(), model.getShare());
+        return new GroupShareResponseDto(model.getFieldId(), model.getFieldName(), model.getShare());
     }
 }

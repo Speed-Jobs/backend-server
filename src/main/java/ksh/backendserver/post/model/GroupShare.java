@@ -8,8 +8,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class GroupShare {
 
-    private long groupId;
-    private String groupName;
+    private long fieldId;
+    private String fieldName;
     private double share;
 
     public static GroupShare from(GroupCountProjection projection, long totalPostCount) {
@@ -17,8 +17,8 @@ public class GroupShare {
         double roundedShare = Math.round(share * 10) / 10.0;
 
         return new GroupShare(
-            projection.getGroupId(),
-            projection.getGroupName(),
+            projection.getFieldId(),
+            projection.getFieldName(),
             roundedShare
         );
     }

@@ -223,7 +223,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         LocalDateTime start = end.minusDays(dateRange.getDuration());
         BooleanExpression postedInRange = post.postedAt.goe(start).and(post.postedAt.lt(end));
 
-        JobFieldCategory groupCategory = request.getGroupCategory();
+        JobFieldCategory groupCategory = request.getFieldCategory();
         BooleanExpression groupCategoryEquals = jobField.category.eq(groupCategory);
 
         BooleanExpression notDeleted = post.isDeleted.isFalse();

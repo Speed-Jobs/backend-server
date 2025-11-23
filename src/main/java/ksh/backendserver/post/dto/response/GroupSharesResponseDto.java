@@ -21,7 +21,7 @@ public class GroupSharesResponseDto {
     private GroupSharesResponseDto(List<GroupShareResponseDto> dtos) {
         this.distributions = dtos;
         this.legend = dtos.stream()
-            .map(GroupShareResponseDto::getGroupName)
+            .map(GroupShareResponseDto::getFieldName)
             .toList();
     }
 }
