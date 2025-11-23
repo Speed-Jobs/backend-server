@@ -4,8 +4,11 @@ import jakarta.validation.Valid;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
 import ksh.backendserver.company.enums.DateRange;
 import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
+import ksh.backendserver.post.dto.request.RoleShareStatRequestDto;
 import ksh.backendserver.post.dto.response.GroupShareResponseDto;
 import ksh.backendserver.post.dto.response.GroupSharesResponseDto;
+import ksh.backendserver.post.dto.response.RoleShareResponseDto;
+import ksh.backendserver.post.dto.response.RoleSharesResponseDto;
 import ksh.backendserver.post.service.PostStatService;
 import ksh.backendserver.skill.dto.request.SkillStatRequestDto;
 import ksh.backendserver.skill.dto.response.SkillCloudSnapshotResponseDto;
@@ -63,12 +66,13 @@ public class PostStatController {
     @GetMapping("/api/v1/dashboard/job-group")
     public ApiResponseDto<GroupSharesResponseDto> distributionByJobGroup(
         @Valid GroupShareStatRequestDto request
-        ) {
+    ) {
         var distributions = postStatService.findPostDistributionByJobGroup(request)
             .stream()
             .map(GroupShareResponseDto::from)
             .toList();
 
+        //TODO: 여기 of로 바꾸기
         var body = GroupSharesResponseDto.from(distributions);
 
         return ApiResponseDto.of(
@@ -77,6 +81,28 @@ public class PostStatController {
             "직군 별 공고 분포 조회 성공",
             body
         );
+    }
 
+    @GetMapping("/api/v1/dashboard/job-group/{groupId}")
+    public ApiResponseDto<RoleSharesResponseDto> distributionByJobRole(
+        @Valid RoleShareStatRequestDto request,
+        @PathVariable("groupId") long groupId
+    ) {
+        var dtos = postStatService.findPostDistributionByJobRoleOfGroup(
+                request,
+                groupId
+            )
+            .stream()
+            .map(RoleShareResponseDto::from)
+            .toList();
+
+        var body = RoleSharesResponseDto.of(dtos);
+
+        return ApiResponseDto.of(
+            HttpStatus.OK.value(),
+            HttpStatus.OK.name(),
+            "특정 직군 내 직무 별 공고 분포 조회 성공",
+            body
+        );
     }
 }
