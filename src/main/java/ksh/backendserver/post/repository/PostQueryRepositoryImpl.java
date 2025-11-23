@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static ksh.backendserver.company.entity.QCompany.company;
-import static ksh.backendserver.group.entity.QJobGroup.jobGroup;
+import static ksh.backendserver.group.entity.QJobField.jobField;
 import static ksh.backendserver.post.entity.QPost.post;
 import static ksh.backendserver.role.entity.QJobRole.jobRole;
 
@@ -135,18 +135,18 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return queryFactory
             .select(Projections.constructor(
                 GroupCountProjection.class,
-                jobGroup.id,
-                jobGroup.name,
+                jobField.id,
+                jobField.name,
                 post.id.count()
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
             .join(jobRole).on(post.roleId.eq(jobRole.id))
-            .join(jobGroup).on(jobRole.fieldId.eq(jobGroup.id))
+            .join(jobField).on(jobRole.fieldId.eq(jobField.id))
             .where(
                 groupShareFilter(request, end)
             )
-            .groupBy(jobGroup.name)
+            .groupBy(jobField.name)
             .fetch();
 
     }
@@ -224,7 +224,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         BooleanExpression postedInRange = post.postedAt.goe(start).and(post.postedAt.lt(end));
 
         JobFieldCategory groupCategory = request.getGroupCategory();
-        BooleanExpression groupCategoryEquals = jobGroup.category.eq(groupCategory);
+        BooleanExpression groupCategoryEquals = jobField.category.eq(groupCategory);
 
         BooleanExpression notDeleted = post.isDeleted.isFalse();
 
