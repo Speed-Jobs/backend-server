@@ -4,12 +4,10 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class PostSummaryRequestDto {
 
@@ -19,7 +17,7 @@ public class PostSummaryRequestDto {
 
     private List<Long> companyIds;
 
-    public Integer getLimit() {
-        return limit != null ? limit : 10;
+    public int getLimit() {
+        return limit == null ? 10 : limit;
     }
 }
