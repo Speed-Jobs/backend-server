@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -17,6 +18,21 @@ import java.util.Locale;
 public class GlobalControllerAdvice {
 
     private final MessageSource messageSource;
+
+    @ExceptionHandler(BindException.class)
+    public ApiResponseDto<Object> bindException(BindException e) {
+        String errorMessage = e.getBindingResult()
+            .getAllErrors()
+            .get(0)
+            .getDefaultMessage();
+
+        return ApiResponseDto.of(
+            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.BAD_REQUEST.name(),
+            errorMessage,
+            null
+        );
+    }
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponseDto> handleCustomException(CustomException e, Locale locale) {
