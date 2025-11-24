@@ -1,8 +1,9 @@
 package ksh.backendserver.company.controller;
 
 import ksh.backendserver.common.dto.response.ApiResponseDto;
+import ksh.backendserver.company.dto.response.CompanyFilterResponseDto;
 import ksh.backendserver.company.dto.response.CompanyResponseDto;
-import ksh.backendserver.company.dto.response.CompanyResponseDtos;
+import ksh.backendserver.company.dto.response.CompanyFilterResponseDtos;
 import ksh.backendserver.company.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,13 +17,13 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @GetMapping("/api/v1/companies/filter")
-    public ApiResponseDto<CompanyResponseDtos> getCompanyFilter() {
+    public ApiResponseDto<CompanyFilterResponseDtos> getCompanyFilter() {
         var dtos = companyService.findCompanyFilters()
             .stream()
-            .map(CompanyResponseDto::from)
+            .map(CompanyFilterResponseDto::from)
             .toList();
 
-        var body = CompanyResponseDtos.from(dtos);
+        var body = CompanyFilterResponseDtos.from(dtos);
 
         return ApiResponseDto.of(
                 HttpStatus.OK.value(),
