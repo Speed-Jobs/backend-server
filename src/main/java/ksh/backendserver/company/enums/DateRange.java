@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum DateRange {
 
+    YEARLY(365),
     MONTHLY(30),
     WEEKLY(7),
     DAILY(1);
