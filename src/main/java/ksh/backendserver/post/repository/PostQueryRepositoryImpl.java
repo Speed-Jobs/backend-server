@@ -160,7 +160,6 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return queryFactory
             .select(Projections.constructor(
                 JobRoleCountProjection.class,
-                jobRole.id,
                 jobRole.name,
                 post.id.count()
             ))
