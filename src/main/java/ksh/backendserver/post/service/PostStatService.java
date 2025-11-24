@@ -117,10 +117,6 @@ public class PostStatService {
             totalPostCountInPeriod
         );
 
-        double weeklyChangeRate = calculatePeriodChangeRate(
-            topSkillId,
-            DateRange.WEEKLY.getDuration()
-        );
         double monthlyChangeRate = calculatePeriodChangeRate(
             topSkillId,
             DateRange.MONTHLY.getDuration()
@@ -129,7 +125,6 @@ public class PostStatService {
         return SkillStat.of(
             topSkillCountInPeriod,
             topSkillMarketShare,
-            weeklyChangeRate,
             monthlyChangeRate
         );
     }

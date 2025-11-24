@@ -12,7 +12,6 @@ public class SkillStatResponseDto {
 
     private long count;
     private double marketShare;
-    private double weeklyChangeRate;
     private double monthlyChangeRate;
 
     public static SkillStatResponseDto from(SkillStat skillStat) {
@@ -23,7 +22,6 @@ public class SkillStatResponseDto {
         return new SkillStatResponseDto(
             skillStat.getCountInPeriod(),
             skillStat.getMarketShare(),
-            skillStat.getWeeklyChangeRate(),
             skillStat.getMonthlyChangeRate()
         );
     }
