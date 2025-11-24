@@ -13,6 +13,7 @@ public class SkillStatResponseDto {
     private long count;
     private double marketShare;
     private double monthlyChangeRate;
+    private boolean isMonthlyChangeRateAvailable;
 
     public static SkillStatResponseDto from(SkillStat skillStat) {
         if(skillStat == null) {
@@ -22,7 +23,8 @@ public class SkillStatResponseDto {
         return new SkillStatResponseDto(
             skillStat.getCountInPeriod(),
             skillStat.getMarketShare(),
-            skillStat.getMonthlyChangeRate()
+            skillStat.getMonthlyChangeRate(),
+            skillStat.isMonthlyChangeRateAvailable()
         );
     }
 }

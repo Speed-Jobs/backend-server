@@ -25,8 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostStatService {
 
-    private static final double CHANGE_RATE_UNAVAILABLE = -1.0;
-
     private final PostRepository postRepository;
     private final PostSkillRepository postSkillRepository;
     private final Clock clock;
@@ -117,15 +115,16 @@ public class PostStatService {
             totalPostCountInPeriod
         );
 
-        double monthlyChangeRate = calculatePeriodChangeRate(
-            topSkillId,
-            DateRange.MONTHLY.getDuration()
-        );
+        boolean isMonthlyChangeRateAvailable = isPreviousPeriodDataAvailable(topSkillId, DateRange.MONTHLY.getDuration());
+        double monthlyChangeRate = isMonthlyChangeRateAvailable
+            ? calculatePeriodChangeRate(topSkillId, DateRange.MONTHLY.getDuration())
+            : 0.0;
 
         return SkillStat.of(
             topSkillCountInPeriod,
             topSkillMarketShare,
-            monthlyChangeRate
+            monthlyChangeRate,
+            isMonthlyChangeRateAvailable
         );
     }
 
@@ -166,10 +165,26 @@ public class PostStatService {
     }
 
     private double computeChangeRate(long previousCount, long currentCount) {
-        if (previousCount == 0) {
-            return CHANGE_RATE_UNAVAILABLE;
-        }
         double changeRate = (double) (currentCount - previousCount) / previousCount * 100;
         return Math.round(changeRate * 10.0) / 10.0;
+    }
+
+    private boolean isPreviousPeriodDataAvailable(long skillId, int rangeLength) {
+        LocalDate today = LocalDate.now(clock);
+
+        LocalDateTime previousPeriodStart = today
+            .minusDays(rangeLength * 2L - 1L)
+            .atStartOfDay();
+        LocalDateTime previousPeriodEnd = today
+            .minusDays(rangeLength - 1L)
+            .atStartOfDay();
+
+        long previousPeriodCount = postSkillRepository.countBySkillIdBetween(
+            skillId,
+            previousPeriodStart,
+            previousPeriodEnd
+        );
+
+        return previousPeriodCount > 0;
     }
 }
