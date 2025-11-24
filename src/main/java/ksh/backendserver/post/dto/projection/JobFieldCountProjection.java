@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class GroupCountProjection {
+public class JobFieldCountProjection {
 
-    private long groupId;
-    private String groupName;
+    private long fieldId;
+    private String fieldName;
     private long postCount;
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class RoleCountProjection {
+public class JobRoleCountProjection {
 
     private String roleName;
     private long postCount;

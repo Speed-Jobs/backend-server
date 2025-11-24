@@ -3,12 +3,12 @@ package ksh.backendserver.post.controller;
 import jakarta.validation.Valid;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
 import ksh.backendserver.company.enums.DateRange;
-import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
-import ksh.backendserver.post.dto.request.RoleShareStatRequestDto;
-import ksh.backendserver.post.dto.response.GroupShareResponseDto;
-import ksh.backendserver.post.dto.response.GroupSharesResponseDto;
-import ksh.backendserver.post.dto.response.RoleShareResponseDto;
-import ksh.backendserver.post.dto.response.RoleSharesResponseDto;
+import ksh.backendserver.post.dto.request.JobFieldShareStatRequestDto;
+import ksh.backendserver.post.dto.request.JobRoleShareStatRequestDto;
+import ksh.backendserver.post.dto.response.JobFieldShareResponseDto;
+import ksh.backendserver.post.dto.response.JobFieldSharesResponseDto;
+import ksh.backendserver.post.dto.response.JobRoleShareResponseDto;
+import ksh.backendserver.post.dto.response.JobRoleSharesResponseDto;
 import ksh.backendserver.post.service.PostStatService;
 import ksh.backendserver.skill.dto.request.SkillStatRequestDto;
 import ksh.backendserver.skill.dto.response.SkillCloudSnapshotResponseDto;
@@ -64,16 +64,16 @@ public class PostStatController {
 
     //TODO: RequestParam 기본값 잘 동작하는지 테스트
     @GetMapping("/api/v1/dashboard/job-group")
-    public ApiResponseDto<GroupSharesResponseDto> distributionByJobGroup(
-        @Valid GroupShareStatRequestDto request
+    public ApiResponseDto<JobFieldSharesResponseDto> distributionByJobGroup(
+        @Valid JobFieldShareStatRequestDto request
     ) {
-        var distributions = postStatService.findPostDistributionByJobGroup(request)
+        var distributions = postStatService.findPostDistributionByJobField(request)
             .stream()
-            .map(GroupShareResponseDto::from)
+            .map(JobFieldShareResponseDto::from)
             .toList();
 
         //TODO: 여기 of로 바꾸기
-        var body = GroupSharesResponseDto.of(distributions);
+        var body = JobFieldSharesResponseDto.of(distributions);
 
         return ApiResponseDto.of(
             HttpStatus.OK.value(),
@@ -84,19 +84,19 @@ public class PostStatController {
     }
 
     @GetMapping("/api/v1/dashboard/job-group/{groupId}")
-    public ApiResponseDto<RoleSharesResponseDto> distributionByJobRole(
-        @Valid RoleShareStatRequestDto request,
+    public ApiResponseDto<JobRoleSharesResponseDto> distributionByJobRole(
+        @Valid JobRoleShareStatRequestDto request,
         @PathVariable("groupId") long groupId
     ) {
-        var dtos = postStatService.findPostDistributionByJobRoleOfGroup(
+        var dtos = postStatService.findPostDistributionByJobRoleOfField(
                 request,
                 groupId
             )
             .stream()
-            .map(RoleShareResponseDto::from)
+            .map(JobRoleShareResponseDto::from)
             .toList();
 
-        var body = RoleSharesResponseDto.of(dtos);
+        var body = JobRoleSharesResponseDto.of(dtos);
 
         return ApiResponseDto.of(
             HttpStatus.OK.value(),

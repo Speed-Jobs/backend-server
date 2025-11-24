@@ -8,13 +8,13 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import ksh.backendserver.common.exception.CustomException;
 import ksh.backendserver.common.exception.ErrorCode;
 import ksh.backendserver.company.enums.DateRange;
-import ksh.backendserver.group.enums.GroupCategory;
-import ksh.backendserver.post.dto.projection.GroupCountProjection;
+import ksh.backendserver.group.enums.JobFieldCategory;
+import ksh.backendserver.post.dto.projection.JobFieldCountProjection;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
-import ksh.backendserver.post.dto.projection.RoleCountProjection;
-import ksh.backendserver.post.dto.request.GroupShareStatRequestDto;
+import ksh.backendserver.post.dto.projection.JobRoleCountProjection;
+import ksh.backendserver.post.dto.request.JobFieldShareStatRequestDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
-import ksh.backendserver.post.dto.request.RoleShareStatRequestDto;
+import ksh.backendserver.post.dto.request.JobRoleShareStatRequestDto;
 import ksh.backendserver.post.enums.PostSortCriteria;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static ksh.backendserver.company.entity.QCompany.company;
-import static ksh.backendserver.group.entity.QJobGroup.jobGroup;
+import static ksh.backendserver.group.entity.QJobField.jobField;
 import static ksh.backendserver.post.entity.QPost.post;
 import static ksh.backendserver.role.entity.QJobRole.jobRole;
 
@@ -128,38 +128,38 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
     
     @Override
-    public List<GroupCountProjection> countByFieldFilteredByFieldCategory(
-        GroupShareStatRequestDto request,
+    public List<JobFieldCountProjection> countByFieldFilteredByFieldCategory(
+        JobFieldShareStatRequestDto request,
         LocalDateTime end
     ) {
         return queryFactory
             .select(Projections.constructor(
-                GroupCountProjection.class,
-                jobGroup.id,
-                jobGroup.name,
+                JobFieldCountProjection.class,
+                jobField.id,
+                jobField.name,
                 post.id.count()
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
             .join(jobRole).on(post.roleId.eq(jobRole.id))
-            .join(jobGroup).on(jobRole.fieldId.eq(jobGroup.id))
+            .join(jobField).on(jobRole.fieldId.eq(jobField.id))
             .where(
                 groupShareFilter(request, end)
             )
-            .groupBy(jobGroup.name)
+            .groupBy(jobField.name)
             .fetch();
 
     }
 
     @Override
-    public List<RoleCountProjection> countByRoleFilteredByFieldId(
-        RoleShareStatRequestDto request,
-        long groupId,
+    public List<JobRoleCountProjection> countByRoleFilteredByFieldId(
+        JobRoleShareStatRequestDto request,
+        long fieldId,
         LocalDateTime end
     ) {
         return queryFactory
             .select(Projections.constructor(
-                RoleCountProjection.class,
+                JobRoleCountProjection.class,
                 jobRole.id,
                 jobRole.name,
                 post.id.count()
@@ -168,7 +168,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .join(company).on(post.companyId.eq(company.id))
             .join(jobRole).on(post.roleId.eq(jobRole.id))
             .where(
-                roleShareFilter(request, groupId, end)
+                roleShareFilter(request, fieldId, end)
             )
             .groupBy(jobRole.name)
             .fetch();
@@ -211,7 +211,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return new OrderSpecifier<?>[]{primaryOrder, tieBreaker};
     }
 
-    private Predicate groupShareFilter(GroupShareStatRequestDto request, LocalDateTime end) {
+    private Predicate groupShareFilter(JobFieldShareStatRequestDto request, LocalDateTime end) {
 
         BooleanExpression postScope = switch (request.getScope()) {
             case ALL -> null;
@@ -223,8 +223,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         LocalDateTime start = end.minusDays(dateRange.getDuration());
         BooleanExpression postedInRange = post.postedAt.goe(start).and(post.postedAt.lt(end));
 
-        GroupCategory groupCategory = request.getGroupCategory();
-        BooleanExpression groupCategoryEquals = jobGroup.category.eq(groupCategory);
+        JobFieldCategory groupCategory = request.getFieldCategory();
+        BooleanExpression groupCategoryEquals = jobField.category.eq(groupCategory);
 
         BooleanExpression notDeleted = post.isDeleted.isFalse();
 
@@ -236,7 +236,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         );
     }
 
-    private Predicate roleShareFilter(RoleShareStatRequestDto request, long groupId, LocalDateTime end) {
+    private Predicate roleShareFilter(JobRoleShareStatRequestDto request, long fieldId, LocalDateTime end) {
 
         BooleanExpression postScope = switch (request.getScope()) {
             case ALL -> null;
@@ -248,14 +248,14 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         LocalDateTime start = end.minusDays(dateRange.getDuration());
         BooleanExpression postedInRange = post.postedAt.goe(start).and(post.postedAt.lt(end));
 
-        BooleanExpression groupIdEquals = jobRole.fieldId.eq(groupId);
+        BooleanExpression fieldIdEquals = jobRole.fieldId.eq(fieldId);
 
         BooleanExpression notDeleted = post.isDeleted.isFalse();
 
         return ExpressionUtils.allOf(
             postScope,
             postedInRange,
-            groupIdEquals,
+            fieldIdEquals,
             notDeleted
         );
     }
