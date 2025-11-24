@@ -63,8 +63,8 @@ public class PostStatController {
     }
 
     //TODO: RequestParam 기본값 잘 동작하는지 테스트
-    @GetMapping("/api/v1/dashboard/job-group")
-    public ApiResponseDto<JobFieldSharesResponseDto> distributionByJobGroup(
+    @GetMapping("/api/v1/dashboard/job-field")
+    public ApiResponseDto<JobFieldSharesResponseDto> distributionByJobField(
         @Valid JobFieldShareStatRequestDto request
     ) {
         var distributions = postStatService.findPostDistributionByJobField(request)
@@ -72,7 +72,6 @@ public class PostStatController {
             .map(JobFieldShareResponseDto::from)
             .toList();
 
-        //TODO: 여기 of로 바꾸기
         var body = JobFieldSharesResponseDto.of(distributions);
 
         return ApiResponseDto.of(
@@ -83,14 +82,14 @@ public class PostStatController {
         );
     }
 
-    @GetMapping("/api/v1/dashboard/job-group/{groupId}")
+    @GetMapping("/api/v1/dashboard/job-field/{fieldId}")
     public ApiResponseDto<JobRoleSharesResponseDto> distributionByJobRole(
         @Valid JobRoleShareStatRequestDto request,
-        @PathVariable("groupId") long groupId
+        @PathVariable("fieldId") long fieldId
     ) {
         var dtos = postStatService.findPostDistributionByJobRoleOfField(
                 request,
-                groupId
+                fieldId
             )
             .stream()
             .map(JobRoleShareResponseDto::from)
