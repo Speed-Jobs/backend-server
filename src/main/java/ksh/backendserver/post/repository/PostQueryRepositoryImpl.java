@@ -16,6 +16,7 @@ import ksh.backendserver.post.dto.request.JobFieldShareStatRequestDto;
 import ksh.backendserver.post.dto.request.JobRoleShareStatRequestDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.enums.PostSortCriteria;
+import ksh.backendserver.role.entity.QIndustry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +28,7 @@ import java.util.List;
 import static ksh.backendserver.company.entity.QCompany.company;
 import static ksh.backendserver.group.entity.QPosition.position;
 import static ksh.backendserver.post.entity.QPost.post;
-import static ksh.backendserver.role.entity.QJobRole.jobRole;
+import static ksh.backendserver.role.entity.QIndustry.*;
 
 @RequiredArgsConstructor
 public class PostQueryRepositoryImpl implements PostQueryRepository {
@@ -49,13 +50,13 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 PostWithCompanyAndRole.class,
                 post,
                 company,
-                jobRole
+                industry
             ))
             .from(post)
             .join(company)
             .on(post.companyId.eq(company.id))
-            .join(jobRole)
-            .on(post.industryId.eq(jobRole.id))
+            .join(industry)
+            .on(post.industryId.eq(industry.id))
             .where(
                 companyIdsFilter,
                 post.postedAt.loe(now),
@@ -78,11 +79,11 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 PostWithCompanyAndRole.class,
                 post,
                 company,
-                jobRole
+                industry
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .join(jobRole).on(post.industryId.eq(jobRole.id))
+            .join(industry).on(post.industryId.eq(industry.id))
             .where(
                 postSearchFilter(postRequestDto, now)
             )
@@ -112,11 +113,11 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 PostWithCompanyAndRole.class,
                 post,
                 company,
-                jobRole
+                industry
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .join(jobRole).on(post.industryId.eq(jobRole.id))
+            .join(industry).on(post.industryId.eq(industry.id))
             .where(post.id.eq(postId))
             .fetchOne();
 
@@ -141,8 +142,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .join(jobRole).on(post.industryId.eq(jobRole.id))
-            .join(position).on(jobRole.positionId.eq(position.id))
+            .join(industry).on(post.industryId.eq(industry.id))
+            .join(position).on(industry.positionId.eq(position.id))
             .where(
                 groupShareFilter(request, end)
             )
@@ -159,16 +160,16 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return queryFactory
             .select(Projections.constructor(
                 JobRoleCountProjection.class,
-                jobRole.name,
+                industry.name,
                 post.id.count()
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .join(jobRole).on(post.industryId.eq(jobRole.id))
+            .join(industry).on(post.industryId.eq(industry.id))
             .where(
                 roleShareFilter(request, fieldId, end)
             )
-            .groupBy(jobRole.name)
+            .groupBy(industry.name)
             .fetch();
     }
 
@@ -246,7 +247,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         LocalDateTime start = end.minusDays(dateRange.getDuration());
         BooleanExpression postedInRange = post.postedAt.goe(start).and(post.postedAt.lt(end));
 
-        BooleanExpression fieldIdEquals = jobRole.positionId.eq(fieldId);
+        BooleanExpression fieldIdEquals = industry.positionId.eq(fieldId);
 
         BooleanExpression notDeleted = post.isDeleted.isFalse();
 

@@ -4,7 +4,7 @@ import ksh.backendserver.company.entity.Company;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
 import ksh.backendserver.post.entity.Post;
 import ksh.backendserver.post.enums.ExperienceLevel;
-import ksh.backendserver.role.entity.JobRole;
+import ksh.backendserver.role.entity.Industry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -29,7 +29,7 @@ public class PostSummary {
 
     private PostSummary(PostWithCompanyAndRole projection, LocalDate now) {
         Post post = projection.getPost();
-        JobRole jobRole = projection.getJobRole();
+        Industry jobRole = projection.getJobRole();
 
         this.id = post.getId();
         this.title = post.getTitle();

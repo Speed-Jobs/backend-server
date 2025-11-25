@@ -14,9 +14,9 @@ import org.hibernate.annotations.Where;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "update job_role set is_deleted = true where id = ?")
+@SQLDelete(sql = "update industry set is_deleted = true where id = ?")
 @Where(clause = "is_deleted = false")
-public class JobRole extends BaseEntity {
+public class Industry extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
