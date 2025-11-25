@@ -36,9 +36,9 @@ public class Company extends BaseEntity {
     private Integer foundedYear;
 
     @Enumerated(EnumType.STRING)
-    private CompanySize companySize;
+    private CompanySize size;
 
-    private String logoUrl;
+    private String logo;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isCompetitor;

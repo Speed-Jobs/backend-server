@@ -1,8 +1,7 @@
-package ksh.backendserver.group.entity;
+package ksh.backendserver.role.entity;
 
 import jakarta.persistence.*;
 import ksh.backendserver.BaseEntity;
-import ksh.backendserver.group.enums.JobFieldCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,9 +14,9 @@ import org.hibernate.annotations.Where;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "update job_field set is_deleted = true where id = ?")
+@SQLDelete(sql = "update industry set is_deleted = true where id = ?")
 @Where(clause = "is_deleted = false")
-public class JobField extends BaseEntity {
+public class Industry extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,8 +26,7 @@ public class JobField extends BaseEntity {
 
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    private JobFieldCategory category;
+    private Long positionId;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isDeleted;

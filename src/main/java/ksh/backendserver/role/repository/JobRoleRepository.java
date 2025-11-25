@@ -1,7 +1,7 @@
 package ksh.backendserver.role.repository;
 
-import ksh.backendserver.role.entity.JobRole;
+import ksh.backendserver.role.entity.Industry;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface JobRoleRepository extends JpaRepository<JobRole,Long> {
+public interface JobRoleRepository extends JpaRepository<Industry,Long> {
 }

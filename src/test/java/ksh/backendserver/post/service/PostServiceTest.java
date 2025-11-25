@@ -6,7 +6,7 @@ import ksh.backendserver.post.entity.Post;
 import ksh.backendserver.post.enums.ExperienceLevel;
 import ksh.backendserver.post.model.PostSummary;
 import ksh.backendserver.post.repository.PostRepository;
-import ksh.backendserver.role.entity.JobRole;
+import ksh.backendserver.role.entity.Industry;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,7 +54,7 @@ class PostServiceTest {
 
         Company company = createCompany(2L, "네이버");
 
-        JobRole role = createJobRole(2L, "프론트엔드 개발자");
+        Industry role = createJobRole(2L, "프론트엔드 개발자");
 
         Post post = createPost(
             2L, 2L, 2L,
@@ -89,8 +89,8 @@ class PostServiceTest {
             .build();
     }
 
-    private JobRole createJobRole(Long id, String name) {
-        return JobRole.builder()
+    private Industry createJobRole(Long id, String name) {
+        return Industry.builder()
             .id(id)
             .name(name)
             .build();
@@ -100,9 +100,9 @@ class PostServiceTest {
         return Post.builder()
             .id(id)
             .companyId(companyId)
-            .roleId(roleId)
+            .industryId(roleId)
             .title(title)
-            .experienceLevel(experience)
+            .experience(experience)
             .postedAt(postedAt)
             .closeAt(closeAt)
             .build();

@@ -7,8 +7,11 @@ import ksh.backendserver.company.repository.CompanyRepository;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.entity.Post;
-import ksh.backendserver.post.enums.*;
-import ksh.backendserver.role.entity.JobRole;
+import ksh.backendserver.post.enums.EmploymentType;
+import ksh.backendserver.post.enums.ExperienceLevel;
+import ksh.backendserver.post.enums.PostSortCriteria;
+import ksh.backendserver.post.enums.WorkType;
+import ksh.backendserver.role.entity.Industry;
 import ksh.backendserver.role.repository.JobRoleRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,8 +41,8 @@ class PostQueryRepositoryImplTest {
 
     private Company company1;
     private Company company2;
-    private JobRole jobRole1;
-    private JobRole jobRole2;
+    private Industry jobRole1;
+    private Industry jobRole2;
     private Post post1;
     private Post post2;
     private Post post3;
@@ -232,11 +235,11 @@ class PostQueryRepositoryImplTest {
             .build());
     }
 
-    private JobRole createJobRole(String name) {
-        return jobRoleRepository.save(JobRole.builder()
+    private Industry createJobRole(String name) {
+        return jobRoleRepository.save(Industry.builder()
             .name(name)
             .description("Job Role Description")
-            .fieldId(1L)
+            .positionId(1L)
             .isDeleted(false)
             .build());
     }
@@ -248,13 +251,12 @@ class PostQueryRepositoryImplTest {
         return postRepository.save(Post.builder()
             .title(title)
             .employmentType(employmentType)
-            .experienceLevel(experienceLevel)
+            .experience(experienceLevel)
             .workType(WorkType.ON_SITE)
-            .status(PostStatus.OPEN)
             .postedAt(postedAt)
             .closeAt(closeAt)
             .companyId(companyId)
-            .roleId(roleId)
+            .industryId(roleId)
             .sourceUrl("url")
             .isDeleted(false)
             .build());

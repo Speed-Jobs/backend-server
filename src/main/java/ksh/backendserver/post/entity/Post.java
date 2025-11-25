@@ -34,25 +34,28 @@ public class Post extends BaseEntity {
     private EmploymentType employmentType;
 
     @Enumerated(EnumType.STRING)
-    private ExperienceLevel experienceLevel;
+    private ExperienceLevel experience;
 
     @Enumerated(EnumType.STRING)
     private WorkType workType;
-
-    @Enumerated(EnumType.STRING)
-    private PostStatus status;
 
     private LocalDateTime postedAt;
 
     private LocalDateTime closeAt;
 
+    private LocalDateTime crawledAt;
+
     private String sourceUrl;
 
     private String screenshotUrl;
 
+    private String description;
+
+    private String urlHash;
+
     private Long companyId;
 
-    private Long roleId;
+    private Long industryId;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isDeleted;

@@ -2,7 +2,7 @@ package ksh.backendserver.post.dto.projection;
 
 import ksh.backendserver.company.entity.Company;
 import ksh.backendserver.post.entity.Post;
-import ksh.backendserver.role.entity.JobRole;
+import ksh.backendserver.role.entity.Industry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,5 +12,5 @@ public class PostWithCompanyAndRole {
 
     private Post post;
     private Company company;
-    private JobRole jobRole;
+    private Industry jobRole;
 }
