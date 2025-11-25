@@ -55,7 +55,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .join(company)
             .on(post.companyId.eq(company.id))
             .join(jobRole)
-            .on(post.roleId.eq(jobRole.id))
+            .on(post.industryId.eq(jobRole.id))
             .where(
                 companyIdsFilter,
                 post.postedAt.loe(now),
@@ -82,7 +82,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .join(jobRole).on(post.roleId.eq(jobRole.id))
+            .join(jobRole).on(post.industryId.eq(jobRole.id))
             .where(
                 postSearchFilter(postRequestDto, now)
             )
@@ -116,7 +116,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .join(jobRole).on(post.roleId.eq(jobRole.id))
+            .join(jobRole).on(post.industryId.eq(jobRole.id))
             .where(post.id.eq(postId))
             .fetchOne();
 
@@ -141,7 +141,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .join(jobRole).on(post.roleId.eq(jobRole.id))
+            .join(jobRole).on(post.industryId.eq(jobRole.id))
             .join(jobField).on(jobRole.fieldId.eq(jobField.id))
             .where(
                 groupShareFilter(request, end)
@@ -165,7 +165,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .join(jobRole).on(post.roleId.eq(jobRole.id))
+            .join(jobRole).on(post.industryId.eq(jobRole.id))
             .where(
                 roleShareFilter(request, fieldId, end)
             )

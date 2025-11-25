@@ -39,7 +39,7 @@ public class PostDetail {
         this.id = post.getId();
         this.title = post.getTitle();
         this.role = jobRole.getName();
-        this.experience = post.getExperienceLevel();
+        this.experience = post.getExperience();
         this.daysLeft = calculateDaysLeft(post.getCloseAt(), now);
         this.postedAt = post.getPostedAt();
         this.closedAt = post.getCloseAt();
