@@ -26,7 +26,7 @@ public class JobRole extends BaseEntity {
 
     private String description;
 
-    private Long fieldId;
+    private Long positionId;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isDeleted;
