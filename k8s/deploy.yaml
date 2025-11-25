@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: speedjobs-server
+  namespace: skala-practice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: speedjobs-server
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8080'
+        prometheus.io/path: '/actuator/prometheus'
+        update: b0f8a1c602f344289d143f8d7d5e84b7
+      labels:
+        app: speedjobs-server
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: speedjobs-server
+        image: amdp-registry.skala-ai.com/skala25a/speedjobs-server:1.0.0
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        - name: mgmt
+          containerPort: 8081
+          protocol: TCP
+        env:
+        - name: NAMESPACE
+          value: skala-practice
+        - name: SPRING_PROFILES_ACTIVE  
+          value: "prod"
+        - name: DB_HOST
+          value: "speedjobs-mysql.skala-practice.svc.cluster.local"
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: speedjobs-mysql-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: speedjobs-mysql-secret
+              key: password
+        - name: DB_NAME
+          value: "speedjobs"
