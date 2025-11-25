@@ -14,5 +14,22 @@ spring:
         default_batch_fetch_size: 1000
         dialect: org.hibernate.dialect.MySQLDialect
 
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,metrics,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  
 logging.level:
   org.hibernate.SQL: warn
