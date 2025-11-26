@@ -16,7 +16,6 @@ import ksh.backendserver.post.dto.request.JobFieldShareStatRequestDto;
 import ksh.backendserver.post.dto.request.JobRoleShareStatRequestDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.enums.PostSortCriteria;
-import ksh.backendserver.role.entity.QIndustry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +27,7 @@ import java.util.List;
 import static ksh.backendserver.company.entity.QCompany.company;
 import static ksh.backendserver.group.entity.QPosition.position;
 import static ksh.backendserver.post.entity.QPost.post;
-import static ksh.backendserver.role.entity.QIndustry.*;
+import static ksh.backendserver.role.entity.QIndustry.industry;
 
 @RequiredArgsConstructor
 public class PostQueryRepositoryImpl implements PostQueryRepository {
@@ -97,7 +96,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .select(post.count())
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .where(postSearchFilter(postRequestDto, now));
+            .where(
+                postSearchFilter(postRequestDto, now)
+            );
 
         return PageableExecutionUtils.getPage(
             content,
@@ -174,24 +175,17 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     private Predicate postSearchFilter(PostRequestDto dto, LocalDateTime now) {
-        BooleanExpression workTypeEq = dto.getEmploymentType() == null
-            ? null
-            : post.employmentType.eq(dto.getEmploymentType());
-
-        BooleanExpression companyNamesIn = dto.getCompanyNames() == null || dto.getCompanyNames().isEmpty()
-            ? null
-            : company.name.in(dto.getCompanyNames());
-
-        BooleanExpression postedAtLessOrEqualThanNow = post.postedAt.loe(now);
-        BooleanExpression closeAtGreaterThanNow = post.closeAt.gt(now);
-        BooleanExpression notDeleted = post.isDeleted.isFalse();
-
         return ExpressionUtils.allOf(
-            workTypeEq,
-            companyNamesIn,
-            postedAtLessOrEqualThanNow,
-            closeAtGreaterThanNow,
-            notDeleted
+            employmentTypeEquals(dto),
+            companyNamesIn(dto),
+            experienceEquals(dto),
+            industryNameEquals(dto),
+            postTitleContains(dto),
+            crawledAtEquals(dto),
+            postedAtInYearMonth(dto),
+            postedAtLessOrEqualThanNow(now),
+            closeAtGreaterThanNow(dto, now),
+            notDeleted()
         );
     }
 
@@ -257,5 +251,67 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             fieldIdEquals,
             notDeleted
         );
+    }
+
+    private BooleanExpression employmentTypeEquals(PostRequestDto dto) {
+        return dto.getEmploymentType() == null
+            ? null
+            : post.employmentType.eq(dto.getEmploymentType());
+    }
+
+    private BooleanExpression companyNamesIn(PostRequestDto dto) {
+        return dto.getCompanyNames() == null || dto.getCompanyNames().isEmpty()
+            ? null
+            : company.name.in(dto.getCompanyNames());
+    }
+
+    private BooleanExpression experienceEquals(PostRequestDto dto) {
+        return dto.getExperienceLevel() == null
+            ? null
+            : post.experience.eq(dto.getExperienceLevel());
+    }
+
+    private BooleanExpression industryNameEquals(PostRequestDto dto) {
+        return dto.getIndustryName() == null
+            ? null
+            : industry.name.eq(dto.getIndustryName());
+    }
+
+    private BooleanExpression postTitleContains(PostRequestDto dto) {
+        return dto.getPostTitle() == null
+            ? null
+            : post.title.contains(dto.getPostTitle());
+    }
+
+    private BooleanExpression crawledAtEquals(PostRequestDto dto) {
+        return dto.getCrawledAt() == null
+            ? null
+            : post.crawledAt.goe(dto.getCrawledAt().atStartOfDay())
+            .and(post.crawledAt.lt(dto.getCrawledAt().plusDays(1).atStartOfDay()));
+    }
+
+    private BooleanExpression postedAtInYearMonth(PostRequestDto dto) {
+        if (dto.getYear() == null || dto.getMonth() == null) {
+            return null;
+        }
+
+        LocalDateTime startOfMonth = LocalDateTime.of(dto.getYear(), dto.getMonth(), 1, 0, 0);
+        LocalDateTime startOfNextMonth = startOfMonth.plusMonths(1);
+
+        return post.postedAt.goe(startOfMonth).and(post.postedAt.lt(startOfNextMonth));
+    }
+
+    private BooleanExpression postedAtLessOrEqualThanNow(LocalDateTime now) {
+        return post.postedAt.loe(now);
+    }
+
+    private BooleanExpression closeAtGreaterThanNow(PostRequestDto dto, LocalDateTime now) {
+        return Boolean.TRUE.equals(dto.getIncludePast())
+            ? null
+            : post.closeAt.gt(now);
+    }
+
+    private BooleanExpression notDeleted() {
+        return post.isDeleted.isFalse();
     }
 }
