@@ -1,25 +1,28 @@
 package ksh.backendserver.post.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import ksh.backendserver.common.vo.Date;
 import ksh.backendserver.company.dto.response.CompanyResponseDto;
+import ksh.backendserver.post.enums.EmploymentType;
 import ksh.backendserver.post.enums.ExperienceLevel;
-import ksh.backendserver.post.enums.WorkType;
 import ksh.backendserver.post.model.PostInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostResponseDto {
 
     private long id;
     private String title;
     private String role;
     private ExperienceLevel experience;
+    private EmploymentType employmentType;
     private Date postedAt;
     private Date closeAt;
-    private WorkType workType;
-    private int daysLeft;
+    private Date crawledAt;
+    private Integer daysLeft;
 
     private CompanyResponseDto company;
 
@@ -32,9 +35,12 @@ public class PostResponseDto {
         this.title = postInfo.getTitle();
         this.role = postInfo.getRole();
         this.experience = postInfo.getExperience();
+        this.employmentType = postInfo.getEmploymentType();
         this.postedAt = Date.from(postInfo.getPostedAt().toLocalDate());
         this.closeAt = Date.from(postInfo.getClosedAt().toLocalDate());
-        this.workType = postInfo.getWorkType();
+        this.crawledAt = postInfo.getCrawledAt() != null
+            ? Date.from(postInfo.getCrawledAt().toLocalDate())
+            : null;
         this.daysLeft = postInfo.getDaysLeft();
 
         this.company = CompanyResponseDto.from(postInfo.getCompany());
