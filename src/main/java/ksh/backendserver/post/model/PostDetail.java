@@ -24,6 +24,7 @@ public class PostDetail {
     private LocalDateTime postedAt;
     private LocalDateTime closedAt;
     private String applyUrl;
+    private String screenShotUrl;
     private List<String> skills;
 
     private Company company;
@@ -44,6 +45,7 @@ public class PostDetail {
         this.postedAt = post.getPostedAt();
         this.closedAt = post.getCloseAt();
         this.applyUrl = post.getSourceUrl();
+        this.screenShotUrl = post.getScreenshotUrl();
         this.skills = skillNames;
 
         this.company = projection.getCompany();

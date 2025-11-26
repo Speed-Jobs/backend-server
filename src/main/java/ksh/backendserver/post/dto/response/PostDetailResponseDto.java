@@ -20,6 +20,7 @@ public class PostDetailResponseDto {
     private DateTime postedAt;
     private DateTime closeAt;
     private String applyUrl;
+    private String screenShotUrl;
     private List<String> skills;
 
     private CompanyResponseDto company;
@@ -37,6 +38,7 @@ public class PostDetailResponseDto {
         this.postedAt = DateTime.from(postDetail.getPostedAt());
         this.closeAt = DateTime.from(postDetail.getClosedAt());
         this.applyUrl = postDetail.getApplyUrl();
+        this.screenShotUrl = postDetail.getScreenShotUrl();
         this.skills = postDetail.getSkills();
 
         this.company = CompanyResponseDto.from(postDetail.getCompany());
