@@ -2,10 +2,12 @@ package ksh.backendserver.post.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import ksh.backendserver.post.enums.EmploymentType;
+import ksh.backendserver.post.enums.ExperienceLevel;
 import ksh.backendserver.post.enums.PostSortCriteria;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -20,4 +22,18 @@ public class PostRequestDto {
     private Boolean isAscending;
 
     private List<String> companyNames;
+
+    private ExperienceLevel experienceLevel;
+
+    private String industryName;
+
+    private Boolean includePast;
+
+    private Integer year;
+
+    private Integer month;
+
+    private String postTitle;
+
+    private LocalDate crawledAt;
 }
