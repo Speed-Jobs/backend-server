@@ -27,5 +27,5 @@ public class PostRequestDto {
 
     private LocalDate crawledAt;
 
-    private Long positionId;
+    private String positionName;
 }
