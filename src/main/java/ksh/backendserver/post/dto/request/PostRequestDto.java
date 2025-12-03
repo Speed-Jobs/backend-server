@@ -1,8 +1,6 @@
 package ksh.backendserver.post.dto.request;
 
 import jakarta.validation.constraints.NotNull;
-import ksh.backendserver.post.enums.EmploymentType;
-import ksh.backendserver.post.enums.ExperienceLevel;
 import ksh.backendserver.post.enums.PostSortCriteria;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,20 +12,12 @@ import java.util.List;
 @AllArgsConstructor
 public class PostRequestDto {
 
-    private EmploymentType employmentType;
-
     private PostSortCriteria sort;
 
     @NotNull(message = "정렬 방향은 필수입니다.")
     private Boolean isAscending;
 
     private List<String> companyNames;
-
-    private ExperienceLevel experienceLevel;
-
-    private String industryName;
-
-    private Boolean includePast;
 
     private Integer year;
 
@@ -36,4 +26,6 @@ public class PostRequestDto {
     private String postTitle;
 
     private LocalDate crawledAt;
+
+    private Long positionId;
 }
