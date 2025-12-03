@@ -3,7 +3,6 @@ package ksh.backendserver.post.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import ksh.backendserver.common.vo.Date;
 import ksh.backendserver.company.dto.response.CompanyResponseDto;
-import ksh.backendserver.post.enums.EmploymentType;
 import ksh.backendserver.post.enums.ExperienceLevel;
 import ksh.backendserver.post.model.PostInfo;
 import lombok.AllArgsConstructor;
@@ -18,7 +17,7 @@ public class PostResponseDto {
     private String title;
     private String role;
     private ExperienceLevel experience;
-    private EmploymentType employmentType;
+    private String employmentType;
     private Date postedAt;
     private Date closeAt;
     private Date crawledAt;

@@ -2,9 +2,7 @@ package ksh.backendserver.post.entity;
 
 import jakarta.persistence.*;
 import ksh.backendserver.BaseEntity;
-import ksh.backendserver.post.enums.EmploymentType;
 import ksh.backendserver.post.enums.ExperienceLevel;
-import ksh.backendserver.post.enums.PostStatus;
 import ksh.backendserver.post.enums.WorkType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,8 +28,7 @@ public class Post extends BaseEntity {
 
     private String title;
 
-    @Enumerated(EnumType.STRING)
-    private EmploymentType employmentType;
+    private String employmentType;
 
     @Enumerated(EnumType.STRING)
     private ExperienceLevel experience;
