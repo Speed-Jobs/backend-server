@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum PostSortCriteria {
 
     POST_AT,
-    NAME,
+    COMPANY_NAME,
+    TITLE,
     LEFT_DAYS
 }
