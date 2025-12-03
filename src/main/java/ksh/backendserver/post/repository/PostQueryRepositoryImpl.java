@@ -27,6 +27,7 @@ import java.util.List;
 import static ksh.backendserver.company.entity.QCompany.company;
 import static ksh.backendserver.group.entity.QPosition.position;
 import static ksh.backendserver.post.entity.QPost.post;
+import static ksh.backendserver.post.enums.PostSortCriteria.POST_AT;
 import static ksh.backendserver.role.entity.QIndustry.industry;
 
 @RequiredArgsConstructor
@@ -176,26 +177,24 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private Predicate postSearchFilter(PostRequestDto dto, LocalDateTime now) {
         return ExpressionUtils.allOf(
-            employmentTypeEquals(dto),
             companyNamesIn(dto),
-            experienceEquals(dto),
-            industryNameEquals(dto),
             postTitleContains(dto),
             crawledAtEquals(dto),
             postedAtInYearMonth(dto),
             postedAtLessOrEqualThanNow(now),
-            closeAtGreaterThanNow(dto, now),
+            positionIdEquals(dto),
             notDeleted()
         );
     }
 
     private OrderSpecifier<?>[] postOrder(PostRequestDto dto) {
         Order order = dto.getIsAscending() ? Order.ASC : Order.DESC;
-        PostSortCriteria sortCriteria = dto.getSort() != null ? dto.getSort() : PostSortCriteria.POST_AT;
+        PostSortCriteria sortCriteria = dto.getSort() != null ? dto.getSort() : POST_AT;
 
         OrderSpecifier<?> primaryOrder = switch (sortCriteria) {
             case POST_AT -> new OrderSpecifier<>(order, post.postedAt);
-            case NAME -> new OrderSpecifier<>(order, company.name);
+            case COMPANY_NAME -> new OrderSpecifier<>(order, company.name);
+            case TITLE -> new OrderSpecifier<>(order, post.title);
             case LEFT_DAYS -> new OrderSpecifier<>(order, post.closeAt);
         };
 
@@ -253,34 +252,16 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         );
     }
 
-    private BooleanExpression employmentTypeEquals(PostRequestDto dto) {
-        return dto.getEmploymentType() == null
-            ? null
-            : post.employmentType.eq(dto.getEmploymentType());
-    }
-
     private BooleanExpression companyNamesIn(PostRequestDto dto) {
         return dto.getCompanyNames() == null || dto.getCompanyNames().isEmpty()
             ? null
             : company.name.in(dto.getCompanyNames());
     }
 
-    private BooleanExpression experienceEquals(PostRequestDto dto) {
-        return dto.getExperienceLevel() == null
-            ? null
-            : post.experience.eq(dto.getExperienceLevel());
-    }
-
-    private BooleanExpression industryNameEquals(PostRequestDto dto) {
-        return dto.getIndustryName() == null
-            ? null
-            : industry.name.eq(dto.getIndustryName());
-    }
-
     private BooleanExpression postTitleContains(PostRequestDto dto) {
         return dto.getPostTitle() == null
             ? null
-            : post.title.contains(dto.getPostTitle());
+            : post.title.lower().contains(dto.getPostTitle().toLowerCase());
     }
 
     private BooleanExpression crawledAtEquals(PostRequestDto dto) {
@@ -298,17 +279,20 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         LocalDateTime startOfMonth = LocalDateTime.of(dto.getYear(), dto.getMonth(), 1, 0, 0);
         LocalDateTime startOfNextMonth = startOfMonth.plusMonths(1);
 
-        return post.postedAt.goe(startOfMonth).and(post.postedAt.lt(startOfNextMonth));
+        var actualPostedAt = post.postedAt.coalesce(post.crawledAt);
+
+        return actualPostedAt.goe(startOfMonth).and(actualPostedAt.lt(startOfNextMonth));
     }
 
     private BooleanExpression postedAtLessOrEqualThanNow(LocalDateTime now) {
-        return post.postedAt.loe(now);
+        var actualPostedAt = post.postedAt.coalesce(post.crawledAt);
+        return actualPostedAt.loe(now);
     }
 
-    private BooleanExpression closeAtGreaterThanNow(PostRequestDto dto, LocalDateTime now) {
-        return Boolean.TRUE.equals(dto.getIncludePast())
+    private BooleanExpression positionIdEquals(PostRequestDto dto) {
+        return dto.getPositionId() == null
             ? null
-            : post.closeAt.gt(now);
+            : industry.positionId.eq(dto.getPositionId());
     }
 
     private BooleanExpression notDeleted() {
