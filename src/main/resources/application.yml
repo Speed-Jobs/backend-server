@@ -16,3 +16,7 @@ spring:
 
 logging.level:
   org.hibernate.SQL: debug
+
+image:
+  base-path: C:/Users/saree98/Desktop/images
+  default-quality: 0.8
