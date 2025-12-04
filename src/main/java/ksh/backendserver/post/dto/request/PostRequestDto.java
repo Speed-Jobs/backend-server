@@ -5,7 +5,6 @@ import ksh.backendserver.post.enums.PostSortCriteria;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -24,8 +23,6 @@ public class PostRequestDto {
     private Integer month;
 
     private String postTitle;
-
-    private LocalDate crawledAt;
 
     private String positionName;
 }

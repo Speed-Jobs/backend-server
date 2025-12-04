@@ -182,7 +182,6 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return ExpressionUtils.allOf(
             companyNamesIn(dto),
             postTitleContains(dto),
-            crawledAtEquals(dto),
             postedAtInYearMonth(dto),
             postedAtLessOrEqualThanNow(now),
             positionNameEquals(dto),
@@ -265,13 +264,6 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return dto.getPostTitle() == null
             ? null
             : post.title.lower().contains(dto.getPostTitle().toLowerCase());
-    }
-
-    private BooleanExpression crawledAtEquals(PostRequestDto dto) {
-        return dto.getCrawledAt() == null
-            ? null
-            : post.crawledAt.goe(dto.getCrawledAt().atStartOfDay())
-            .and(post.crawledAt.lt(dto.getCrawledAt().plusDays(1).atStartOfDay()));
     }
 
     private BooleanExpression postedAtInYearMonth(PostRequestDto dto) {
