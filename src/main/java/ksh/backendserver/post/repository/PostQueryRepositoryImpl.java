@@ -84,6 +84,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
             .join(industry).on(post.industryId.eq(industry.id))
+            .join(position).on(industry.positionId.eq(position.id))
             .where(
                 postSearchFilter(postRequestDto, now)
             )
@@ -97,6 +98,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .select(post.count())
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
+            .join(industry).on(post.industryId.eq(industry.id))
+            .join(position).on(industry.positionId.eq(position.id))
             .where(
                 postSearchFilter(postRequestDto, now)
             );
@@ -182,7 +185,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             crawledAtEquals(dto),
             postedAtInYearMonth(dto),
             postedAtLessOrEqualThanNow(now),
-            positionIdEquals(dto),
+            positionNameEquals(dto),
             notDeleted()
         );
     }
@@ -289,10 +292,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return actualPostedAt.loe(now);
     }
 
-    private BooleanExpression positionIdEquals(PostRequestDto dto) {
-        return dto.getPositionId() == null
+    private BooleanExpression positionNameEquals(PostRequestDto dto) {
+        return dto.getPositionName() == null
             ? null
-            : industry.positionId.eq(dto.getPositionId());
+            : position.name.lower().eq(dto.getPositionName().toLowerCase());
     }
 
     private BooleanExpression notDeleted() {
