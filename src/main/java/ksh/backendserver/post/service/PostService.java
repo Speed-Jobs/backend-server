@@ -1,5 +1,8 @@
 package ksh.backendserver.post.service;
 
+import ksh.backendserver.common.exception.CustomException;
+import ksh.backendserver.common.exception.ErrorCode;
+import ksh.backendserver.group.repository.PositionRepository;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.model.PostDetail;
 import ksh.backendserver.post.model.PostInfo;
@@ -23,6 +26,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostSkillRepository postSkillRepository;
+    private final PositionRepository positionRepository;
     private final Clock clock;
 
     @Transactional(readOnly = true)
@@ -43,6 +47,9 @@ public class PostService {
         PostRequestDto dto,
         Pageable pageable
     ) {
+        positionRepository.findByName(dto.getPositionName())
+            .orElseThrow(() -> new CustomException(ErrorCode.POSITION_NOT_FOUND));
+
         return postRepository
             .findByFilters(dto, pageable, LocalDateTime.now(clock))
             .map(post -> PostInfo.from(post, LocalDate.now(clock)));

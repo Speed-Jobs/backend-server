@@ -11,6 +11,7 @@ public enum ErrorCode {
     MEMBER_DUPLICATE_EMAIL(400, "member.duplicate.email"),
     MEMBER_PASSWORD_MISMATCH(400, "member.password.mismatch"),
     POST_NOT_FOUND(404, "post.not.found"),
+    POSITION_NOT_FOUND(404, "position.not.found"),
     INTERNAL_SERVER_ERROR(500, "internal.server.error");
 
     private final int status;
