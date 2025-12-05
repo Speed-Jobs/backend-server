@@ -16,6 +16,9 @@ java {
 
 ext {
     querydslVersion = '5.1.0'
+    webPVersion = '0.1.6'
+    thumbnailatorVersion = '0.4.20'
+    awsSdkVersion = '2.20.0'
 }
 
 configurations {
@@ -56,10 +59,19 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // Swagger/SpringDoc OpenAPI
+    //Swagger/SpringDoc OpenAPI
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    //WebP
+    implementation "org.sejda.imageio:webp-imageio:${webPVersion}"
+
+    //Thumbnailator
+    implementation "net.coobird:thumbnailator:${thumbnailatorVersion}"
+
+    //AWS S3
+    implementation "software.amazon.awssdk:s3:${awsSdkVersion}"
 }
 
 tasks.named('test') {
