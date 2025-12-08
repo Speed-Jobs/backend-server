@@ -46,7 +46,7 @@ public class PostController {
     }
 
     @GetMapping("/api/v1/posts")
-    public ApiResponseDto<PageResponseDto> competitorPosts(
+    public ApiResponseDto<PageResponseDto<PostResponseDto>> competitorPosts(
         @Valid PostRequestDto postRequest,
         @Valid PageRequestDto pageRequest
     ) {
