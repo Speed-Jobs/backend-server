@@ -59,11 +59,11 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .on(post.industryId.eq(industry.id))
             .where(
                 companyIdsFilter,
-                post.postedAt.loe(now),
+                post.postedAt.coalesce(post.crawledAt).loe(now),
                 post.closeAt.gt(now),
                 post.isDeleted.eq(false)
             )
-            .orderBy(post.postedAt.desc())
+            .orderBy(post.postedAt.coalesce(post.crawledAt).desc())
             .limit(size)
             .fetch();
     }
@@ -194,7 +194,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         PostSortCriteria sortCriteria = dto.getSort() != null ? dto.getSort() : POST_AT;
 
         OrderSpecifier<?> primaryOrder = switch (sortCriteria) {
-            case POST_AT -> new OrderSpecifier<>(order, post.postedAt);
+            case POST_AT -> new OrderSpecifier<>(order, post.postedAt.coalesce(post.crawledAt));
             case COMPANY_NAME -> new OrderSpecifier<>(order, company.name);
             case TITLE -> new OrderSpecifier<>(order, post.title);
             case LEFT_DAYS -> new OrderSpecifier<>(order, post.closeAt);
