@@ -3,6 +3,7 @@ package ksh.backendserver.skill.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import ksh.backendserver.company.enums.DateRange;
+import ksh.backendserver.skill.dto.projection.PostSkillWithSkill;
 import ksh.backendserver.skill.dto.projection.SkillWithCount;
 import lombok.RequiredArgsConstructor;
 
@@ -99,5 +100,23 @@ public class PostSkillQueryRepositoryImpl implements PostSkillQueryRepository {
                 postSkill.isDeleted.isFalse()
             )
             .fetchOne();
+    }
+
+    @Override
+    public List<PostSkillWithSkill> findWithSkillByPostIdIn(List<Long> postIds) {
+        return queryFactory
+            .select(Projections.constructor(
+                PostSkillWithSkill.class,
+                postSkill,
+                skill
+            ))
+            .from(postSkill)
+            .join(skill).on(postSkill.skillId.eq(skill.id))
+            .join(post).on(postSkill.postId.eq(post.id))
+            .where(
+                post.id.in(postIds),
+                postSkill.isDeleted.isFalse()
+            )
+            .fetch();
     }
 }

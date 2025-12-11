@@ -1,0 +1,10 @@
+package ksh.backendserver.skill.repository;
+
+import ksh.backendserver.skill.entity.SubscriptionSkill;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface SubscriptionSkillRepository extends JpaRepository<SubscriptionSkill, Long> {
+    List<SubscriptionSkill> findByUserId(Long userId);
+}

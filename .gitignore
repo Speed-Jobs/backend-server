@@ -39,3 +39,6 @@ out/
 
 ### Claude ###
 .claude/
+
+### Environment ###
+env.properties
