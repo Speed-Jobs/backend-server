@@ -11,6 +11,7 @@ import ksh.backendserver.company.enums.DateRange;
 import ksh.backendserver.group.enums.JobFieldCategory;
 import ksh.backendserver.post.dto.projection.JobFieldCountProjection;
 import ksh.backendserver.post.dto.projection.JobRoleCountProjection;
+import ksh.backendserver.post.dto.projection.PostWithCompany;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
 import ksh.backendserver.post.dto.request.JobFieldShareStatRequestDto;
 import ksh.backendserver.post.dto.request.JobRoleShareStatRequestDto;
@@ -175,6 +176,23 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 roleShareFilter(request, fieldId, end)
             )
             .groupBy(industry.name)
+            .fetch();
+    }
+
+    @Override
+    public List<PostWithCompany> findByCrawledAtAfterCheckpoint(LocalDateTime checkpoint) {
+        return queryFactory
+            .select(Projections.constructor(
+                PostWithCompany.class,
+                post,
+                company
+            ))
+            .from(post)
+            .join(company).on(post.companyId.eq(company.id))
+            .where(
+                post.crawledAt.goe(checkpoint),
+                post.isDeleted.isFalse()
+            )
             .fetch();
     }
 
