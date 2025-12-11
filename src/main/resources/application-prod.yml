@@ -14,6 +14,32 @@ spring:
         default_batch_fetch_size: 1000
         dialect: org.hibernate.dialect.MySQLDialect
 
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    default-encoding: UTF-8
+    properties:
+      mail:
+        mime:
+          charset: UTF-8
+        smtp:
+          auth: true
+          timeout: ${MAIL_TIMEOUT}
+          starttls:
+            enable: true
+
+aws:
+  s3:
+    access-key-id: ${AWS_S3_ACCESS_KEY}
+    secret-access-key: ${AWS_S3_SECRET_KEY}
+    region: ap-northeast-2
+    access-point-arn: arn:aws:s3:ap-northeast-2:881490135253:accesspoint/sk-team-storage
+    prefix: skala2/images/
+
+image:
+  default-quality: 0.8
 
 management:
   endpoints:
@@ -30,6 +56,3 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
-  
-logging.level:
-  org.hibernate.SQL: warn
