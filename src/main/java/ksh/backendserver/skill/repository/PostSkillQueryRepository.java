@@ -1,6 +1,7 @@
 package ksh.backendserver.skill.repository;
 
 import ksh.backendserver.company.enums.DateRange;
+import ksh.backendserver.skill.dto.projection.PostSkillWithSkill;
 import ksh.backendserver.skill.dto.projection.SkillWithCount;
 
 import java.time.LocalDate;
@@ -16,4 +17,6 @@ public interface PostSkillQueryRepository {
     Long countBySkillIdSince(long skillId, LocalDateTime baseTime);
 
     Long countBySkillIdBetween(long skillId, LocalDateTime start, LocalDateTime endExclusive);
+
+    List<PostSkillWithSkill> findWithSkillByPostIdIn(List<Long> postIds);
 }
