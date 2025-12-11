@@ -1,6 +1,9 @@
 package ksh.backendserver.post.model;
 
+import ksh.backendserver.company.entity.Company;
+import ksh.backendserver.post.dto.projection.PostWithCompany;
 import ksh.backendserver.post.entity.Post;
+import ksh.backendserver.skill.dto.projection.PostSkillWithSkill;
 import ksh.backendserver.skill.entity.PostSkill;
 import ksh.backendserver.subscription.model.UserSubscription;
 import lombok.AllArgsConstructor;
@@ -14,10 +17,14 @@ import java.util.Set;
 public class PostSkillRequirement {
 
     private Post post;
-    private List<PostSkill> skills;
+    private Company company;
+    private List<PostSkillWithSkill> skills;
 
-    public static PostSkillRequirement of(Post post, List<PostSkill> skills) {
-        return new PostSkillRequirement(post, skills);
+    public static PostSkillRequirement of(PostWithCompany postWithCompany, List<PostSkillWithSkill> skills) {
+        Post post = postWithCompany.getPost();
+        Company company = postWithCompany.getCompany();
+
+        return new PostSkillRequirement(post, company, skills);
     }
 
     public boolean matchesWith(UserSubscription userSubscription) {
@@ -30,6 +37,7 @@ public class PostSkillRequirement {
         if (skillSet.isEmpty()) return true;
 
         return skills.stream()
+            .map(PostSkillWithSkill::getPostSkill)
             .map(PostSkill::getSkillId)
             .anyMatch(skillSet::contains);
     }
