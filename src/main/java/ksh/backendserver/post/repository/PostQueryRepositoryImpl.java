@@ -7,14 +7,8 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import ksh.backendserver.common.exception.CustomException;
 import ksh.backendserver.common.exception.ErrorCode;
-import ksh.backendserver.company.enums.DateRange;
-import ksh.backendserver.group.enums.JobFieldCategory;
-import ksh.backendserver.post.dto.projection.JobFieldCountProjection;
-import ksh.backendserver.post.dto.projection.JobRoleCountProjection;
 import ksh.backendserver.post.dto.projection.PostWithCompany;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
-import ksh.backendserver.post.dto.request.JobFieldShareStatRequestDto;
-import ksh.backendserver.post.dto.request.JobRoleShareStatRequestDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.enums.PostSortCriteria;
 import lombok.RequiredArgsConstructor;
@@ -133,51 +127,6 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
         return result;
     }
-    
-    @Override
-    public List<JobFieldCountProjection> countByFieldFilteredByFieldCategory(
-        JobFieldShareStatRequestDto request,
-        LocalDateTime end
-    ) {
-        return queryFactory
-            .select(Projections.constructor(
-                JobFieldCountProjection.class,
-                position.id,
-                position.name,
-                post.id.count()
-            ))
-            .from(post)
-            .join(company).on(post.companyId.eq(company.id))
-            .join(industry).on(post.industryId.eq(industry.id))
-            .join(position).on(industry.positionId.eq(position.id))
-            .where(
-                groupShareFilter(request, end)
-            )
-            .groupBy(position.name)
-            .fetch();
-    }
-
-    @Override
-    public List<JobRoleCountProjection> countByRoleFilteredByFieldId(
-        JobRoleShareStatRequestDto request,
-        long fieldId,
-        LocalDateTime end
-    ) {
-        return queryFactory
-            .select(Projections.constructor(
-                JobRoleCountProjection.class,
-                industry.name,
-                post.id.count()
-            ))
-            .from(post)
-            .join(company).on(post.companyId.eq(company.id))
-            .join(industry).on(post.industryId.eq(industry.id))
-            .where(
-                roleShareFilter(request, fieldId, end)
-            )
-            .groupBy(industry.name)
-            .fetch();
-    }
 
     @Override
     public List<PostWithCompany> findByCrawledAtAfterCheckpoint(LocalDateTime checkpoint) {
@@ -221,55 +170,6 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         OrderSpecifier<Long> tieBreaker = new OrderSpecifier<>(order, post.id);
 
         return new OrderSpecifier<?>[]{primaryOrder, tieBreaker};
-    }
-
-    private Predicate groupShareFilter(JobFieldShareStatRequestDto request, LocalDateTime end) {
-
-        BooleanExpression postScope = switch (request.getScope()) {
-            case ALL -> null;
-            case COMPETITORS -> company.isCompetitor.isTrue();
-            case SINGLE -> company.name.eq(request.getCompanyName());
-        };
-
-        DateRange dateRange = request.getDateRange();
-        LocalDateTime start = end.minusDays(dateRange.getDuration());
-        BooleanExpression postedInRange = post.postedAt.goe(start).and(post.postedAt.lt(end));
-
-        JobFieldCategory groupCategory = request.getFieldCategory();
-        BooleanExpression groupCategoryEquals = position.category.eq(groupCategory);
-
-        BooleanExpression notDeleted = post.isDeleted.isFalse();
-
-        return ExpressionUtils.allOf(
-            postScope,
-            postedInRange,
-            groupCategoryEquals,
-            notDeleted
-        );
-    }
-
-    private Predicate roleShareFilter(JobRoleShareStatRequestDto request, long fieldId, LocalDateTime end) {
-
-        BooleanExpression postScope = switch (request.getScope()) {
-            case ALL -> null;
-            case COMPETITORS -> company.isCompetitor.isTrue();
-            case SINGLE -> company.name.eq(request.getCompanyName());
-        };
-
-        DateRange dateRange = request.getDateRange();
-        LocalDateTime start = end.minusDays(dateRange.getDuration());
-        BooleanExpression postedInRange = post.postedAt.goe(start).and(post.postedAt.lt(end));
-
-        BooleanExpression fieldIdEquals = industry.positionId.eq(fieldId);
-
-        BooleanExpression notDeleted = post.isDeleted.isFalse();
-
-        return ExpressionUtils.allOf(
-            postScope,
-            postedInRange,
-            fieldIdEquals,
-            notDeleted
-        );
     }
 
     private BooleanExpression companyNamesIn(PostRequestDto dto) {
