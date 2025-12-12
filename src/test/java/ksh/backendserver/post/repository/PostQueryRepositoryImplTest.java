@@ -89,27 +89,6 @@ class PostQueryRepositoryImplTest {
     }
 
     @Test
-    @DisplayName("회사 ID 목록으로 공고를 등록일로 정렬해 조회한다.")
-    void findByIdInOrderByCreatedAtDesc_Success() {
-        // given
-        List<Long> companyIds = List.of(company1.getId(), company2.getId());
-        int size = 10;
-
-        // when
-        var result = postRepository.findByIdInOrderByCreatedAtDesc(
-            companyIds,
-            size,
-            baseTime
-        );
-
-        // then
-        assertThat(result).hasSize(4)
-            .extracting(PostWithCompanyAndRole::getPost)
-            .extracting(Post::getTitle)
-            .containsExactly("공고3 제목", "공고1 제목", "공고4 제목", "공고2 제목");
-    }
-
-    @Test
     @DisplayName("회사 이름으로 필터링 후 등록일로 정렬해 조회한다.")
     void findByFilters_Success() {
         // given

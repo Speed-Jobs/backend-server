@@ -8,7 +8,6 @@ import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.model.PostDashboardCard;
 import ksh.backendserver.post.model.PostDetail;
 import ksh.backendserver.post.model.PostInfo;
-import ksh.backendserver.post.model.PostSummary;
 import ksh.backendserver.post.repository.PostRepository;
 import ksh.backendserver.skill.repository.PostSkillRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,19 +29,6 @@ public class PostService {
     private final PostSkillRepository postSkillRepository;
     private final PositionRepository positionRepository;
     private final Clock clock;
-
-    @Transactional(readOnly = true)
-    public List<PostSummary> findRecentPostSummaries(
-        List<Long> companyIds,
-        int size
-    ) {
-        return postRepository
-            .findByIdInOrderByCreatedAtDesc(companyIds, size, LocalDateTime.now(clock))
-            .stream()
-            .map(post -> PostSummary.from(post, LocalDate.now(clock)))
-            .toList();
-
-    }
 
     @Transactional(readOnly = true)
     public Page<PostInfo> findCompetitorPosts(

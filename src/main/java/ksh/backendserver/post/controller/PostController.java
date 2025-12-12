@@ -13,11 +13,8 @@ import ksh.backendserver.common.dto.response.PageResponseDto;
 import ksh.backendserver.post.dto.request.PostDashboardRequestDto;
 import ksh.backendserver.post.dto.response.PostDashboardCardResponseDto;
 import ksh.backendserver.post.dto.response.PostDetailResponseDto;
-import ksh.backendserver.post.dto.response.PostSummariesResponseDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
-import ksh.backendserver.post.dto.request.PostSummaryRequestDto;
 import ksh.backendserver.post.dto.response.PostSearchItemResponseDto;
-import ksh.backendserver.post.dto.response.PostSummaryResponseDto;
 
 import java.util.List;
 import ksh.backendserver.post.service.PostService;
@@ -33,36 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
     private final PostService postService;
-
-    @Operation(
-        summary = "최근 공고 간단 조회",
-        description = "특정 회사들의 최근 공고를 간단한 형태로 조회합니다. 생성일자 기준 내림차순 정렬되며, limit으로 조회 개수를 제한할 수 있습니다 (기본값: 10, 최소: 1, 최대: 20)."
-    )
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "조회 성공"),
-        @ApiResponse(responseCode = "400", description = "limit 범위 초과 (1~20)")
-    })
-    @GetMapping("/api/v1/posts/simple")
-    public ApiResponseDto<PostSummariesResponseDto> recentPostSummaries(
-        @ParameterObject @Valid PostSummaryRequestDto request
-    ) {
-        var summaries = postService.findRecentPostSummaries(
-                request.getCompanyIds(),
-                request.getLimit()
-            )
-            .stream()
-            .map(PostSummaryResponseDto::from)
-            .toList();
-
-        var body = PostSummariesResponseDto.of(summaries);
-
-        return ApiResponseDto.of(
-            HttpStatus.OK.value(),
-            HttpStatus.OK.name(),
-            "공고 간단 조회 성공",
-            body
-        );
-    }
 
     @Operation(
         summary = "경쟁사 공고 페이징 조회",

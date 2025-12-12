@@ -12,8 +12,6 @@ import java.util.List;
 
 public interface PostQueryRepository {
 
-    List<PostWithCompanyAndRole> findByIdInOrderByCreatedAtDesc(List<Long> companyIds, int size, LocalDateTime now);
-
     Page<PostWithCompanyAndRole> findByFilters(PostRequestDto postRequestDto, Pageable pageable, LocalDateTime now);
 
     PostWithCompanyAndRole getByIdWithCompanyAndRole(Long postId);

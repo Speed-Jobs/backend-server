@@ -32,39 +32,6 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<PostWithCompanyAndRole> findByIdInOrderByCreatedAtDesc(
-        List<Long> companyIds,
-        int size,
-        LocalDateTime now
-    ) {
-        BooleanExpression companyIdsFilter = companyIds == null || companyIds.isEmpty()
-            ? null
-            : post.companyId.in(companyIds);
-
-        return queryFactory
-            .select(Projections.constructor(
-                PostWithCompanyAndRole.class,
-                post,
-                company,
-                industry
-            ))
-            .from(post)
-            .join(company)
-            .on(post.companyId.eq(company.id))
-            .join(industry)
-            .on(post.industryId.eq(industry.id))
-            .where(
-                companyIdsFilter,
-                post.postedAt.coalesce(post.crawledAt).loe(now),
-                post.closeAt.gt(now),
-                post.isDeleted.eq(false)
-            )
-            .orderBy(post.postedAt.coalesce(post.crawledAt).desc())
-            .limit(size)
-            .fetch();
-    }
-
-    @Override
     public Page<PostWithCompanyAndRole> findByFilters(
         PostRequestDto postRequestDto,
         Pageable pageable,
