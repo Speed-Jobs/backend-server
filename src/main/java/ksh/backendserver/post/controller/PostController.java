@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import ksh.backendserver.post.dto.response.PostDashboardCardListResponseDto;
 import org.springdoc.core.annotations.ParameterObject;
 import ksh.backendserver.common.dto.request.PageRequestDto;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
@@ -93,7 +94,7 @@ public class PostController {
         @ApiResponse(responseCode = "400", description = "limit 범위 초과 (1~50)")
     })
     @GetMapping("/api/v1/dashboard/posts")
-    public ApiResponseDto<List<PostDashboardCardResponseDto>> dashboardPosts(
+    public ApiResponseDto<PostDashboardCardListResponseDto> dashboardPosts(
         @ParameterObject @Valid PostDashboardRequestDto request
     ) {
         var cards = postService.getRecentCompetitorPosts(request.getLimit())
@@ -101,11 +102,13 @@ public class PostController {
             .map(PostDashboardCardResponseDto::from)
             .toList();
 
+        var body = PostDashboardCardListResponseDto.of(cards);
+
         return ApiResponseDto.of(
             HttpStatus.OK.value(),
             HttpStatus.OK.name(),
             "대시보드 공고 조회 성공",
-            cards
+            body
         );
     }
 }
