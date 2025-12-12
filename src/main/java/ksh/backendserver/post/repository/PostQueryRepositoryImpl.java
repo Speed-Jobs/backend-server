@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import ksh.backendserver.common.exception.CustomException;
 import ksh.backendserver.common.exception.ErrorCode;
+import ksh.backendserver.post.dto.projection.PostDashboardProjection;
 import ksh.backendserver.post.dto.projection.PostWithCompany;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
 import ksh.backendserver.post.dto.request.PostRequestDto;
@@ -142,6 +143,34 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 post.crawledAt.goe(checkpoint),
                 post.isDeleted.isFalse()
             )
+            .fetch();
+    }
+
+    @Override
+    public List<PostDashboardProjection> findWithCompanyAndIndustryOrderByRegisteredAtDesc(
+        int limit,
+        LocalDateTime now
+    ) {
+        return queryFactory
+            .select(Projections.constructor(
+                PostDashboardProjection.class,
+                post,
+                company,
+                industry,
+                post.postedAt.coalesce(post.crawledAt)
+            ))
+            .from(post)
+            .join(company).on(post.companyId.eq(company.id))
+            .join(industry).on(post.industryId.eq(industry.id))
+            .where(
+                post.postedAt.coalesce(post.crawledAt).loe(now),
+                company.isCompetitor.isTrue(),
+                post.isDeleted.isFalse()
+            )
+            .orderBy(
+                post.postedAt.coalesce(post.crawledAt).desc()
+            )
+            .limit(limit)
             .fetch();
     }
 

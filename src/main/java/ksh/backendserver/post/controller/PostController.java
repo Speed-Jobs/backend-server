@@ -10,12 +10,16 @@ import org.springdoc.core.annotations.ParameterObject;
 import ksh.backendserver.common.dto.request.PageRequestDto;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
 import ksh.backendserver.common.dto.response.PageResponseDto;
+import ksh.backendserver.post.dto.request.PostDashboardRequestDto;
+import ksh.backendserver.post.dto.response.PostDashboardCardResponseDto;
 import ksh.backendserver.post.dto.response.PostDetailResponseDto;
 import ksh.backendserver.post.dto.response.PostSummariesResponseDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.dto.request.PostSummaryRequestDto;
-import ksh.backendserver.post.dto.response.PostResponseDto;
+import ksh.backendserver.post.dto.response.PostSearchItemResponseDto;
 import ksh.backendserver.post.dto.response.PostSummaryResponseDto;
+
+import java.util.List;
 import ksh.backendserver.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -70,7 +74,7 @@ public class PostController {
         @ApiResponse(responseCode = "404", description = "존재하지 않는 포지션명")
     })
     @GetMapping("/api/v1/posts")
-    public ApiResponseDto<PageResponseDto<PostResponseDto>> competitorPosts(
+    public ApiResponseDto<PageResponseDto<PostSearchItemResponseDto>> competitorPosts(
         @ParameterObject @Valid PostRequestDto postRequest,
         @ParameterObject @Valid PageRequestDto pageRequest
     ) {
@@ -78,7 +82,7 @@ public class PostController {
                 postRequest,
                 pageRequest.toPageable()
             )
-            .map(PostResponseDto::from);
+            .map(PostSearchItemResponseDto::from);
 
         var body = PageResponseDto.from(page);
 
@@ -110,6 +114,31 @@ public class PostController {
             HttpStatus.OK.name(),
             "경쟁사 공고 상세 조회 성공",
             body
+        );
+    }
+
+    @Operation(
+        summary = "대시보드 경쟁사 최신 공고 조회",
+        description = "대시보드에 표시할 경쟁사 최신 공고를 카드 형태로 조회합니다. 등록일(없으면 크롤링일) 기준 내림차순 정렬되며, limit으로 조회 개수를 제한할 수 있습니다 (기본값: 10, 최소: 1, 최대: 50)."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "조회 성공"),
+        @ApiResponse(responseCode = "400", description = "limit 범위 초과 (1~50)")
+    })
+    @GetMapping("/api/v1/dashboard/posts")
+    public ApiResponseDto<List<PostDashboardCardResponseDto>> dashboardPosts(
+        @ParameterObject @Valid PostDashboardRequestDto request
+    ) {
+        var cards = postService.getRecentCompetitorPosts(request.getLimit())
+            .stream()
+            .map(PostDashboardCardResponseDto::from)
+            .toList();
+
+        return ApiResponseDto.of(
+            HttpStatus.OK.value(),
+            HttpStatus.OK.name(),
+            "대시보드 공고 조회 성공",
+            cards
         );
     }
 }

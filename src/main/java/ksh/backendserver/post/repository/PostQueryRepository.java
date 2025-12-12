@@ -1,5 +1,6 @@
 package ksh.backendserver.post.repository;
 
+import ksh.backendserver.post.dto.projection.PostDashboardProjection;
 import ksh.backendserver.post.dto.projection.PostWithCompany;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
 import ksh.backendserver.post.dto.request.PostRequestDto;
@@ -18,4 +19,6 @@ public interface PostQueryRepository {
     PostWithCompanyAndRole getByIdWithCompanyAndRole(Long postId);
 
     List<PostWithCompany> findByCrawledAtAfterCheckpoint(LocalDateTime checkpoint);
+
+    List<PostDashboardProjection> findWithCompanyAndIndustryOrderByRegisteredAtDesc(int limit, LocalDateTime now);
 }
