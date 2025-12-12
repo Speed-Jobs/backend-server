@@ -2,7 +2,6 @@ package ksh.backendserver.post.entity;
 
 import jakarta.persistence.*;
 import ksh.backendserver.BaseEntity;
-import ksh.backendserver.post.enums.WorkType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,8 +30,7 @@ public class Post extends BaseEntity {
 
     private String experience;
 
-    @Enumerated(EnumType.STRING)
-    private WorkType workType;
+    private String workType;
 
     private LocalDateTime postedAt;
 
