@@ -173,9 +173,15 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     private BooleanExpression companyNamesIn(PostRequestDto dto) {
-        return dto.getCompanyNames() == null || dto.getCompanyNames().isEmpty()
-            ? null
-            : company.name.in(dto.getCompanyNames());
+        if (dto.getCompanyNames() == null || dto.getCompanyNames().isEmpty()) {
+            return null;
+        }
+
+        List<String> lowerCaseCompanyNames = dto.getCompanyNames().stream()
+            .map(String::toLowerCase)
+            .toList();
+
+        return company.name.lower().in(lowerCaseCompanyNames);
     }
 
     private BooleanExpression postTitleContains(PostRequestDto dto) {
