@@ -3,6 +3,7 @@ package ksh.backendserver.common.image.service;
 import ksh.backendserver.common.exception.CustomException;
 import ksh.backendserver.common.exception.ErrorCode;
 import ksh.backendserver.common.vo.ImageInfo;
+import ksh.backendserver.company.repository.CompanyRepository;
 import ksh.backendserver.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
@@ -29,6 +30,7 @@ public class ImageService {
     private static final String MEDIA_TYPE_WEBP = "image/webp";
 
     private final PostRepository postRepository;
+    private final CompanyRepository companyRepository;
     private final S3Client s3Client;
 
     @Value("${aws.s3.access-point-arn}")
@@ -51,10 +53,29 @@ public class ImageService {
         return new ImageInfo(processedBytes, contentType);
     }
 
+    public ImageInfo getCompanyLogo(long companyId, Integer width, boolean useWebp) {
+        String imageKey = getImageKeyFromCompany(companyId);
+
+        byte[] originalBytes = downloadFromS3(imageKey);
+
+        byte[] processedBytes = resizeAndConvert(originalBytes, width, useWebp);
+        MediaType contentType = determineContentType(useWebp);
+
+        return new ImageInfo(processedBytes, contentType);
+    }
+
     private String getImageKeyFromPost(long postId) {
         String imageKey = postRepository.findById(postId)
             .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND))
             .getScreenshotUrl();
+
+        return prefix + imageKey;
+    }
+
+    private String getImageKeyFromCompany(long companyId) {
+        String imageKey = companyRepository.findById(companyId)
+            .orElseThrow(() -> new CustomException(ErrorCode.COMPANY_NOT_FOUND))
+            .getLogo();
 
         return prefix + imageKey;
     }

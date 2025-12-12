@@ -16,7 +16,9 @@ import java.io.IOException;
 public class ETagHeaderFilter {
 
     private static final String SCREENSHOT_PATH_PATTERN = "/api/v1/posts/\\d+/screenshot";
+    private static final String COMPANY_LOGO_PATH_PATTERN = "/api/v1/companies/\\d+/logo";
     private static final String POSTS_URL_PATTERN = "/api/v1/posts/*";
+    private static final String COMPANIES_URL_PATTERN = "/api/v1/companies/*";
 
     @Bean
     public FilterRegistrationBean<OncePerRequestFilter> etagFilter() {
@@ -30,7 +32,7 @@ public class ETagHeaderFilter {
                 FilterChain filterChain
             ) throws ServletException, IOException {
                 String path = request.getRequestURI();
-                if (path.matches(SCREENSHOT_PATH_PATTERN)) {
+                if (path.matches(SCREENSHOT_PATH_PATTERN) || path.matches(COMPANY_LOGO_PATH_PATTERN)) {
                     etagFilter.doFilter(request, response, filterChain);
                 } else {
                     filterChain.doFilter(request, response);
@@ -39,7 +41,7 @@ public class ETagHeaderFilter {
         };
 
         FilterRegistrationBean<OncePerRequestFilter> registration = new FilterRegistrationBean<>(filter);
-        registration.addUrlPatterns(POSTS_URL_PATTERN);
+        registration.addUrlPatterns(POSTS_URL_PATTERN, COMPANIES_URL_PATTERN);
         return registration;
     }
 }
