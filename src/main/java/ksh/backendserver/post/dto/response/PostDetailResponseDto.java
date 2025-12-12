@@ -55,7 +55,7 @@ public class PostDetailResponseDto {
         this.id = postDetail.getId();
         this.title = postDetail.getTitle();
         this.role = postDetail.getRole();
-        this.experience = postDetail.getExperience().name();
+        this.experience = postDetail.getExperience();
         this.daysLeft = postDetail.getDaysLeft();
         this.postedAt = DateTime.from(postDetail.getPostedAt());
         this.closeAt = DateTime.from(postDetail.getClosedAt());

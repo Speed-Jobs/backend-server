@@ -3,7 +3,6 @@ package ksh.backendserver.post.model;
 import ksh.backendserver.company.entity.Company;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
 import ksh.backendserver.post.entity.Post;
-import ksh.backendserver.post.enums.ExperienceLevel;
 import ksh.backendserver.role.entity.Industry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +17,7 @@ public class PostInfo {
     private long id;
     private String title;
     private String role;
-    private ExperienceLevel experience;
+    private String experience;
     private int daysLeft;
     private String employmentType;
     private LocalDateTime postedAt;

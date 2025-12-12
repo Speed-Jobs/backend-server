@@ -37,7 +37,7 @@ public class PostSummaryResponseDto {
         this.id = summary.getId();
         this.title = summary.getTitle();
         this.role = summary.getRole();
-        this.experience = summary.getExperience().name();
+        this.experience = summary.getExperience();
         this.daysLeft = summary.getDaysLeft();
 
         this.company = CompanyResponseDto.from(summary.getCompany());
