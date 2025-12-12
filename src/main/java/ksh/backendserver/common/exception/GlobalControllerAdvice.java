@@ -1,5 +1,6 @@
 package ksh.backendserver.common.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,8 +59,14 @@ public class GlobalControllerAdvice {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponseDto> handleException(Exception e, Locale locale) {
-        log.info("예외 정보 : {}", e.getMessage());
+    public ResponseEntity<ApiResponseDto> handleException(Exception e, HttpServletRequest request, Locale locale) {
+        log.error(
+            "예외정보 uri={} method={} error={}",
+            request.getRequestURI(),
+            request.getMethod(),
+            e.getMessage(),
+            e
+        );
 
         ApiResponseDto response = ApiResponseDto.of(
             HttpStatus.INTERNAL_SERVER_ERROR.value(),
