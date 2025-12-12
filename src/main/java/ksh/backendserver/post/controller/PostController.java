@@ -6,18 +6,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springdoc.core.annotations.ParameterObject;
 import ksh.backendserver.common.dto.request.PageRequestDto;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
 import ksh.backendserver.common.dto.response.PageResponseDto;
-import ksh.backendserver.post.dto.response.PostDetailResponseDto;
-import ksh.backendserver.post.dto.response.PostSummariesResponseDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.dto.request.PostSummaryRequestDto;
-import ksh.backendserver.post.dto.response.PostResponseDto;
+import ksh.backendserver.post.dto.response.PostDetailResponseDto;
+import ksh.backendserver.post.dto.response.PostSearchItemResponseDto;
+import ksh.backendserver.post.dto.response.PostSummariesResponseDto;
 import ksh.backendserver.post.dto.response.PostSummaryResponseDto;
 import ksh.backendserver.post.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -70,7 +70,7 @@ public class PostController {
         @ApiResponse(responseCode = "404", description = "존재하지 않는 포지션명")
     })
     @GetMapping("/api/v1/posts")
-    public ApiResponseDto<PageResponseDto<PostResponseDto>> competitorPosts(
+    public ApiResponseDto<PageResponseDto<PostSearchItemResponseDto>> competitorPosts(
         @ParameterObject @Valid PostRequestDto postRequest,
         @ParameterObject @Valid PageRequestDto pageRequest
     ) {
@@ -78,7 +78,7 @@ public class PostController {
                 postRequest,
                 pageRequest.toPageable()
             )
-            .map(PostResponseDto::from);
+            .map(PostSearchItemResponseDto::from);
 
         var body = PageResponseDto.from(page);
 
