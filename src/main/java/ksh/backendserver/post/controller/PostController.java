@@ -6,18 +6,22 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import ksh.backendserver.common.dto.request.PageRequestDto;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
 import ksh.backendserver.common.dto.response.PageResponseDto;
+import ksh.backendserver.post.dto.request.PostDashboardRequestDto;
+import ksh.backendserver.post.dto.response.PostDashboardCardResponseDto;
+import ksh.backendserver.post.dto.response.PostDetailResponseDto;
+import ksh.backendserver.post.dto.response.PostSummariesResponseDto;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.dto.request.PostSummaryRequestDto;
-import ksh.backendserver.post.dto.response.PostDetailResponseDto;
 import ksh.backendserver.post.dto.response.PostSearchItemResponseDto;
-import ksh.backendserver.post.dto.response.PostSummariesResponseDto;
 import ksh.backendserver.post.dto.response.PostSummaryResponseDto;
+
+import java.util.List;
 import ksh.backendserver.post.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -110,6 +114,31 @@ public class PostController {
             HttpStatus.OK.name(),
             "경쟁사 공고 상세 조회 성공",
             body
+        );
+    }
+
+    @Operation(
+        summary = "대시보드 경쟁사 최신 공고 조회",
+        description = "대시보드에 표시할 경쟁사 최신 공고를 카드 형태로 조회합니다. 등록일(없으면 크롤링일) 기준 내림차순 정렬되며, limit으로 조회 개수를 제한할 수 있습니다 (기본값: 10, 최소: 1, 최대: 50)."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "조회 성공"),
+        @ApiResponse(responseCode = "400", description = "limit 범위 초과 (1~50)")
+    })
+    @GetMapping("/api/v1/dashboard/posts")
+    public ApiResponseDto<List<PostDashboardCardResponseDto>> dashboardPosts(
+        @ParameterObject @Valid PostDashboardRequestDto request
+    ) {
+        var cards = postService.getRecentCompetitorPosts(request.getLimit())
+            .stream()
+            .map(PostDashboardCardResponseDto::from)
+            .toList();
+
+        return ApiResponseDto.of(
+            HttpStatus.OK.value(),
+            HttpStatus.OK.name(),
+            "대시보드 공고 조회 성공",
+            cards
         );
     }
 }
