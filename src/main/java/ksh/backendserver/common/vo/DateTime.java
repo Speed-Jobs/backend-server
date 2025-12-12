@@ -17,6 +17,8 @@ public class DateTime {
     private int second;
 
     public static DateTime from(LocalDateTime dateTime) {
+        if (dateTime == null) return null;
+
         return new DateTime(
             dateTime.getYear(),
             dateTime.getMonthValue(),

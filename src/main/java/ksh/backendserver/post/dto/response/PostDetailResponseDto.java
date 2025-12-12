@@ -27,7 +27,7 @@ public class PostDetailResponseDto {
     private String experience;
 
     @Schema(description = "마감까지 남은 일수", example = "7")
-    private int daysLeft;
+    private Integer daysLeft;
 
     @Schema(description = "게시 일시")
     private DateTime postedAt;

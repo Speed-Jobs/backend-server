@@ -19,7 +19,7 @@ public class PostDetail {
     private String title;
     private String role;
     private String experience;
-    private int daysLeft;
+    private Integer daysLeft;
     private LocalDateTime postedAt;
     private LocalDateTime closedAt;
     private String applyUrl;
@@ -50,7 +50,10 @@ public class PostDetail {
         this.company = projection.getCompany();
     }
 
-    private int calculateDaysLeft(LocalDateTime closeAt, LocalDate now) {
+    private Integer calculateDaysLeft(LocalDateTime closeAt, LocalDate now) {
+        if (closeAt == null) {
+            return null;
+        }
         LocalDate closeDate = closeAt.toLocalDate();
         return (int) (closeDate.toEpochDay() - now.toEpochDay());
     }
