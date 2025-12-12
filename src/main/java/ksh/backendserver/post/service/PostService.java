@@ -5,6 +5,7 @@ import ksh.backendserver.common.exception.ErrorCode;
 import ksh.backendserver.group.repository.PositionRepository;
 import ksh.backendserver.post.dto.projection.PostWithCompany;
 import ksh.backendserver.post.dto.request.PostRequestDto;
+import ksh.backendserver.post.model.PostDashboardCard;
 import ksh.backendserver.post.model.PostDetail;
 import ksh.backendserver.post.model.PostInfo;
 import ksh.backendserver.post.model.PostSummary;
@@ -67,5 +68,14 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostWithCompany> findNewPostsAfter(LocalDateTime checkpoint) {
         return postRepository.findByCrawledAtAfterCheckpoint(checkpoint);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostDashboardCard> getRecentCompetitorPosts(int limit) {
+        return postRepository
+            .findWithCompanyAndIndustryOrderByRegisteredAtDesc(limit, LocalDateTime.now(clock))
+            .stream()
+            .map(PostDashboardCard::from)
+            .toList();
     }
 }
