@@ -45,3 +45,6 @@ env.properties
 
 ### Kubernetes ###
 k8s/
+
+### Spring Boot local config ###
+application.yml
