@@ -23,8 +23,11 @@ public class PostDetailResponseDto {
     @Schema(description = "직무명", example = "백엔드 개발자")
     private String role;
 
-    @Schema(description = "경력 수준", example = "MID_SENIOR")
+    @Schema(description = "경력 수준", example = "신입")
     private String experience;
+
+    @Schema(description = "고용 형태", example = "인턴")
+    private String employmentType;
 
     @Schema(description = "마감까지 남은 일수", example = "7")
     private Integer daysLeft;
@@ -56,6 +59,7 @@ public class PostDetailResponseDto {
         this.title = postDetail.getTitle();
         this.role = postDetail.getRole();
         this.experience = postDetail.getExperience();
+        this.employmentType = postDetail.getEmploymentType();
         this.daysLeft = postDetail.getDaysLeft();
         this.postedAt = DateTime.from(postDetail.getPostedAt());
         this.closeAt = DateTime.from(postDetail.getClosedAt());

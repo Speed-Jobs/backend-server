@@ -19,6 +19,7 @@ public class PostDetail {
     private String title;
     private String role;
     private String experience;
+    private String employmentType;
     private Integer daysLeft;
     private LocalDateTime postedAt;
     private LocalDateTime closedAt;
@@ -40,6 +41,7 @@ public class PostDetail {
         this.title = post.getTitle();
         this.role = jobRole.getName();
         this.experience = post.getExperience();
+        this.employmentType = post.getEmploymentType();
         this.daysLeft = calculateDaysLeft(post.getCloseAt(), now);
         this.postedAt = post.getPostedAt();
         this.closedAt = post.getCloseAt();

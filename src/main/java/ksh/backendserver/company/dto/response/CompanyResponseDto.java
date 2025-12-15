@@ -16,6 +16,9 @@ public class CompanyResponseDto {
     @Schema(description = "회사명", example = "카카오")
     private String name;
 
+    @Schema(description = "위치", example = "판교")
+    private String location;
+
     public static CompanyResponseDto from(Company company) {
         return new CompanyResponseDto(company);
     }
@@ -23,5 +26,6 @@ public class CompanyResponseDto {
     private CompanyResponseDto(Company company) {
         this.id = company.getId();
         this.name = company.getName();
+        this.location = company.getLocation();
     }
 }
