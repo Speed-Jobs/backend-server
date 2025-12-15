@@ -1,5 +1,6 @@
 package ksh.backendserver.post.model;
 
+import ksh.backendserver.common.util.JsonParserUtil;
 import ksh.backendserver.company.entity.Company;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
 import ksh.backendserver.post.entity.Post;
@@ -10,6 +11,7 @@ import lombok.Getter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @AllArgsConstructor
@@ -26,6 +28,7 @@ public class PostDetail {
     private String applyUrl;
     private String screenShotUrl;
     private List<String> skills;
+    private Map<String, Object> metaData;
 
     private Company company;
 
@@ -48,6 +51,7 @@ public class PostDetail {
         this.applyUrl = post.getSourceUrl();
         this.screenShotUrl = post.getScreenshotUrl();
         this.skills = skillNames;
+        this.metaData = JsonParserUtil.parseAndFilterKoreanKeys(post.getMetaData());
 
         this.company = projection.getCompany();
     }

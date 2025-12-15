@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Map;
 
 @Schema(description = "공고 상세 정보 응답")
 @Getter
@@ -47,6 +48,9 @@ public class PostDetailResponseDto {
     @Schema(description = "필요 스킬 목록", example = "[\"Java\", \"Spring\", \"MySQL\"]")
     private List<String> skills;
 
+    @Schema(description = "메타데이터 (한글 키만 포함)", example = "{\"복지\": \"4대보험, 야근수당\", \"근무환경\": \"자율출퇴근\"}")
+    private Map<String, Object> metaData;
+
     @Schema(description = "회사 정보")
     private CompanyResponseDto company;
 
@@ -66,6 +70,7 @@ public class PostDetailResponseDto {
         this.applyUrl = postDetail.getApplyUrl();
         this.screenShotUrl = postDetail.getScreenShotUrl();
         this.skills = postDetail.getSkills();
+        this.metaData = postDetail.getMetaData();
 
         this.company = CompanyResponseDto.from(postDetail.getCompany());
     }
