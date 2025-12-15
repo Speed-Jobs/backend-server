@@ -46,6 +46,9 @@ public class Post extends BaseEntity {
 
     private String urlHash;
 
+    @Column(columnDefinition = "JSON")
+    private String metaData;
+
     private Long companyId;
 
     private Long industryId;
