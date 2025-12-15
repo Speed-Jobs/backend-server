@@ -17,6 +17,9 @@ public class PostSearchItemResponseDto {
     @Schema(description = "공고 제목", example = "백엔드 개발자 채용")
     private String title;
 
+    @Schema(description = "회사명", example = "SK AX")
+    private String company;
+
     @Schema(description = "고용 형태", example = "FULL_TIME")
     private String employmentType;
 
@@ -30,6 +33,7 @@ public class PostSearchItemResponseDto {
     private PostSearchItemResponseDto(PostInfo postInfo) {
         this.id = postInfo.getId();
         this.title = postInfo.getTitle();
+        this.company = postInfo.getCompany().getName();
         this.employmentType = postInfo.getEmploymentType();
         this.crawledAt = postInfo.getCrawledAt() != null
             ? Date.from(postInfo.getCrawledAt().toLocalDate())
