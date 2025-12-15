@@ -35,8 +35,10 @@ public class PostService {
         PostRequestDto dto,
         Pageable pageable
     ) {
-        positionRepository.findByName(dto.getPositionName())
-            .orElseThrow(() -> new CustomException(ErrorCode.POSITION_NOT_FOUND));
+        if (dto.getPositionName() != null && !dto.getPositionName().isBlank()) {
+            positionRepository.findByName(dto.getPositionName())
+                .orElseThrow(() -> new CustomException(ErrorCode.POSITION_NOT_FOUND));
+        }
 
         return postRepository
             .findByFilters(dto, pageable, LocalDateTime.now(clock))
