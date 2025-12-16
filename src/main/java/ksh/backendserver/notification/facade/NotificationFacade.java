@@ -33,11 +33,11 @@ public class NotificationFacade {
 
         var postSkillRequirements = postSkillService.findSkillRequirementsOf(newPosts);
 
-        var matchedSubscriptions = subscriptionService.findMatchingAlerts(postSkillRequirements);
-        if (matchedSubscriptions.isEmpty()) {
+        var matchedSubscriptionsMap = subscriptionService.findMatchingSubscription(postSkillRequirements);
+        if (matchedSubscriptionsMap.isEmpty()) {
             return;
         }
 
-        notificationService.sendNotifications(matchedSubscriptions);
+        notificationService.sendNotifications(matchedSubscriptionsMap);
     }
 }

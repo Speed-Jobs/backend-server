@@ -27,7 +27,7 @@ public class SubscriptionService {
     private final SubscriptionPositionRepository subscriptionPositionRepository;
     private final SubscriptionCompanyRepository subscriptionCompanyRepository;
 
-    public Map<UserSubscription, List<PostSkillRequirement>> findMatchingAlerts(
+    public Map<UserSubscription, List<PostSkillRequirement>> findMatchingSubscription(
         List<PostSkillRequirement> postings
     ) {
         List<SubscriptionSkill> allSubscribedSkills = subscriptionSkillRepository.findAll();
