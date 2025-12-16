@@ -7,9 +7,11 @@ import ksh.backendserver.group.repository.SubscriptionPositionRepository;
 import ksh.backendserver.post.model.PostSkillRequirement;
 import ksh.backendserver.skill.entity.SubscriptionSkill;
 import ksh.backendserver.skill.repository.SubscriptionSkillRepository;
+import ksh.backendserver.subscription.dto.request.SubscriptionCreationRequestDto;
 import ksh.backendserver.subscription.model.UserSubscription;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,34 @@ public class SubscriptionService {
     private final SubscriptionSkillRepository subscriptionSkillRepository;
     private final SubscriptionPositionRepository subscriptionPositionRepository;
     private final SubscriptionCompanyRepository subscriptionCompanyRepository;
+
+    @Transactional
+    public void create(SubscriptionCreationRequestDto request) {
+        List<SubscriptionCompany> companies = request.getCompanyIds().stream()
+            .map(companyId -> SubscriptionCompany.builder()
+                .userId(request.getMemberId())
+                .companyId(companyId)
+                .build())
+            .toList();
+
+        List<SubscriptionSkill> skills = request.getSkillIds().stream()
+            .map(skillId -> SubscriptionSkill.builder()
+                .userId(request.getMemberId())
+                .skillId(skillId)
+                .build())
+            .toList();
+
+        List<SubscriptionPosition> positions = request.getPositionIds().stream()
+            .map(positionId -> SubscriptionPosition.builder()
+                .userId(request.getMemberId())
+                .positionId(positionId)
+                .build())
+            .toList();
+
+        subscriptionCompanyRepository.saveAll(companies);
+        subscriptionSkillRepository.saveAll(skills);
+        subscriptionPositionRepository.saveAll(positions);
+    }
 
     public Map<UserSubscription, List<PostSkillRequirement>> findMatchingSubscription(
         List<PostSkillRequirement> postings
