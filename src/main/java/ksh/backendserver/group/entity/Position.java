@@ -2,7 +2,7 @@ package ksh.backendserver.group.entity;
 
 import jakarta.persistence.*;
 import ksh.backendserver.BaseEntity;
-import ksh.backendserver.group.enums.JobFieldCategory;
+import ksh.backendserver.group.enums.JobPositionCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,7 +28,7 @@ public class Position extends BaseEntity {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    private JobFieldCategory category;
+    private JobPositionCategory category;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isDeleted;
