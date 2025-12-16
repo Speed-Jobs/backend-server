@@ -41,26 +41,26 @@ public class SubscriptionService {
     private final PositionRepository positionRepository;
 
     @Transactional
-    public void save(SubscriptionCreationRequestDto request) {
-        cancel(request.getMemberId());
+    public void save(SubscriptionCreationRequestDto request, Long memberId) {
+        cancel(memberId);
 
         List<SubscriptionCompany> companies = request.getCompanyIds().stream()
             .map(companyId -> SubscriptionCompany.builder()
-                .userId(request.getMemberId())
+                .userId(memberId)
                 .companyId(companyId)
                 .build())
             .toList();
 
         List<SubscriptionSkill> skills = request.getSkillIds().stream()
             .map(skillId -> SubscriptionSkill.builder()
-                .userId(request.getMemberId())
+                .userId(memberId)
                 .skillId(skillId)
                 .build())
             .toList();
 
         List<SubscriptionPosition> positions = request.getPositionIds().stream()
             .map(positionId -> SubscriptionPosition.builder()
-                .userId(request.getMemberId())
+                .userId(memberId)
                 .positionId(positionId)
                 .build())
             .toList();
