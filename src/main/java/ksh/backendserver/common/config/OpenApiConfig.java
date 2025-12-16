@@ -23,7 +23,7 @@ public class OpenApiConfig {
                     .url("http://localhost:8080")
                     .description("로컬 개발 서버"),
                 new Server()
-                    .url("http://speedjobs-spring.skala25a.project.skala-ai.com")
+                    .url("https://speedjobs-spring.skala25a.project.skala-ai.com")
                     .description("운영 서버")
             ));
     }
