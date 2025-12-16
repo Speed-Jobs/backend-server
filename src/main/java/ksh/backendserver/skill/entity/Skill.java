@@ -25,5 +25,8 @@ public class Skill extends BaseEntity {
     private String name;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isMajor;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isDeleted;
 }
