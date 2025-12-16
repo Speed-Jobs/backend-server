@@ -30,7 +30,9 @@ public class SubscriptionService {
     private final SubscriptionCompanyRepository subscriptionCompanyRepository;
 
     @Transactional
-    public void create(SubscriptionCreationRequestDto request) {
+    public void save(SubscriptionCreationRequestDto request) {
+        cancel(request.getMemberId());
+
         List<SubscriptionCompany> companies = request.getCompanyIds().stream()
             .map(companyId -> SubscriptionCompany.builder()
                 .userId(request.getMemberId())
