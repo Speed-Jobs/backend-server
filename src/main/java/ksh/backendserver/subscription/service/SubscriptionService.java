@@ -2,8 +2,8 @@ package ksh.backendserver.subscription.service;
 
 import ksh.backendserver.company.entity.SubscriptionCompany;
 import ksh.backendserver.company.repository.SubscriptionCompanyRepository;
-import ksh.backendserver.industry.entity.SubscriptionIndustry;
-import ksh.backendserver.industry.repository.SubscriptionIndustryRepository;
+import ksh.backendserver.group.entity.SubscriptionPosition;
+import ksh.backendserver.group.repository.SubscriptionPositionRepository;
 import ksh.backendserver.post.model.PostSkillRequirement;
 import ksh.backendserver.skill.entity.SubscriptionSkill;
 import ksh.backendserver.skill.repository.SubscriptionSkillRepository;
@@ -24,26 +24,26 @@ import java.util.stream.Stream;
 public class SubscriptionService {
 
     private final SubscriptionSkillRepository subscriptionSkillRepository;
-    private final SubscriptionIndustryRepository subscriptionIndustryRepository;
+    private final SubscriptionPositionRepository subscriptionPositionRepository;
     private final SubscriptionCompanyRepository subscriptionCompanyRepository;
 
     public Map<UserSubscription, List<PostSkillRequirement>> findMatchingAlerts(
         List<PostSkillRequirement> postings
     ) {
         List<SubscriptionSkill> allSubscribedSkills = subscriptionSkillRepository.findAll();
-        List<SubscriptionIndustry> allSubscribedIndustries = subscriptionIndustryRepository.findAll();
+        List<SubscriptionPosition> allSubscribedPositions = subscriptionPositionRepository.findAll();
         List<SubscriptionCompany> allSubscribedCompanies = subscriptionCompanyRepository.findAll();
 
         Set<Long> userIds = collectAllSubscribingUserIds(
             allSubscribedSkills,
-            allSubscribedIndustries,
+            allSubscribedPositions,
             allSubscribedCompanies
         );
 
         return buildPostMapByUsers(
             userIds,
             allSubscribedSkills,
-            allSubscribedIndustries,
+            allSubscribedPositions,
             allSubscribedCompanies,
             postings
         );
@@ -51,12 +51,12 @@ public class SubscriptionService {
 
     private Set<Long> collectAllSubscribingUserIds(
         List<SubscriptionSkill> allSkills,
-        List<SubscriptionIndustry> allIndustries,
+        List<SubscriptionPosition> allPositions,
         List<SubscriptionCompany> allCompanies
     ) {
         return Stream.of(
             allSkills.stream().map(SubscriptionSkill::getUserId),
-            allIndustries.stream().map(SubscriptionIndustry::getUserId),
+            allPositions.stream().map(SubscriptionPosition::getUserId),
             allCompanies.stream().map(SubscriptionCompany::getUserId)
         ).flatMap(stream -> stream).collect(Collectors.toSet());
     }
@@ -64,7 +64,7 @@ public class SubscriptionService {
     private Map<UserSubscription, List<PostSkillRequirement>> buildPostMapByUsers(
         Set<Long> userIds,
         List<SubscriptionSkill> allSubscribedSkills,
-        List<SubscriptionIndustry> allSubscribedIndustries,
+        List<SubscriptionPosition> allSubscribedPositions,
         List<SubscriptionCompany> allSubscribedCompanies,
         List<PostSkillRequirement> postings
     ) {
@@ -74,7 +74,7 @@ public class SubscriptionService {
             UserSubscription userSubscription = buildUserSubscription(
                 userId,
                 allSubscribedSkills,
-                allSubscribedIndustries,
+                allSubscribedPositions,
                 allSubscribedCompanies
             );
 
@@ -94,20 +94,20 @@ public class SubscriptionService {
     private UserSubscription buildUserSubscription(
         Long userId,
         List<SubscriptionSkill> allSkills,
-        List<SubscriptionIndustry> allIndustries,
+        List<SubscriptionPosition> allPositions,
         List<SubscriptionCompany> allCompanies
     ) {
         Set<Long> skillIds = extractIdsForUser(
             allSkills, SubscriptionSkill::getUserId, SubscriptionSkill::getSkillId, userId
         );
-        Set<Long> industryIds = extractIdsForUser(
-            allIndustries, SubscriptionIndustry::getUserId, SubscriptionIndustry::getIndustryId, userId
+        Set<Long> positionIds = extractIdsForUser(
+            allPositions, SubscriptionPosition::getUserId, SubscriptionPosition::getPositionId, userId
         );
         Set<Long> companyIds = extractIdsForUser(
             allCompanies, SubscriptionCompany::getUserId, SubscriptionCompany::getCompanyId, userId
         );
 
-        return UserSubscription.of(userId, skillIds, industryIds, companyIds);
+        return UserSubscription.of(userId, skillIds, positionIds, companyIds);
     }
 
     private <T> Set<Long> extractIdsForUser(
