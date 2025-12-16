@@ -2,7 +2,6 @@ package ksh.backendserver.member.entity;
 
 import jakarta.persistence.*;
 import ksh.backendserver.BaseEntity;
-import ksh.backendserver.member.enums.MemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,10 +24,6 @@ public class Member extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MemberRole role;
 
     @Column(nullable = false, unique = true)
     private String email;
