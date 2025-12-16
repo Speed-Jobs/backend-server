@@ -4,21 +4,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
 import ksh.backendserver.subscription.dto.request.SubscriptionCreationRequestDto;
-import ksh.backendserver.subscription.dto.request.SubscriptionDeletionRequestDto;
-import ksh.backendserver.subscription.dto.request.SubscriptionRequestDto;
 import ksh.backendserver.subscription.dto.response.SubscriptionResponseDto;
 import ksh.backendserver.subscription.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "구독", description = "공고 구독 관리 API")
@@ -38,9 +36,13 @@ public class SubscriptionController {
     })
     @PostMapping("/subscriptions")
     public ApiResponseDto<Void> saveSubscription(
-        @Valid @RequestBody SubscriptionCreationRequestDto request
+        @Valid @RequestBody SubscriptionCreationRequestDto requestDto,
+        HttpServletRequest httpRequest
     ) {
-        subscriptionService.save(request);
+        HttpSession session = httpRequest.getSession();
+        Long memberId = (Long) session.getAttribute("memberId");
+
+        subscriptionService.save(requestDto, memberId);
 
         return ApiResponseDto.of(
             HttpStatus.OK.value(),
@@ -60,9 +62,12 @@ public class SubscriptionController {
     })
     @DeleteMapping("/subscriptions")
     public ApiResponseDto<Void> cancelSubscription(
-        @Valid @RequestBody SubscriptionDeletionRequestDto request
+        HttpServletRequest httpRequest
     ) {
-        subscriptionService.cancel(request.getMemberId());
+        HttpSession session = httpRequest.getSession();
+        Long memberId = (Long) session.getAttribute("memberId");
+
+        subscriptionService.cancel(memberId);
 
         return ApiResponseDto.of(
             HttpStatus.OK.value(),
@@ -82,9 +87,12 @@ public class SubscriptionController {
     })
     @GetMapping("/subscriptions")
     public ApiResponseDto<SubscriptionResponseDto> getSubscription(
-        @Valid @ModelAttribute SubscriptionRequestDto request
+        HttpServletRequest httpRequest
     ) {
-        var response = subscriptionService.findByMemberId(request.getMemberId());
+        HttpSession session = httpRequest.getSession();
+        Long memberId = (Long) session.getAttribute("memberId");
+
+        var response = subscriptionService.findByMemberId(memberId);
 
         return ApiResponseDto.of(
             HttpStatus.OK.value(),
