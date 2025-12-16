@@ -1,13 +1,20 @@
 package ksh.backendserver.subscription.service;
 
+import ksh.backendserver.company.entity.Company;
 import ksh.backendserver.company.entity.SubscriptionCompany;
+import ksh.backendserver.company.repository.CompanyRepository;
 import ksh.backendserver.company.repository.SubscriptionCompanyRepository;
+import ksh.backendserver.group.entity.Position;
 import ksh.backendserver.group.entity.SubscriptionPosition;
+import ksh.backendserver.group.repository.PositionRepository;
 import ksh.backendserver.group.repository.SubscriptionPositionRepository;
 import ksh.backendserver.post.model.PostSkillRequirement;
+import ksh.backendserver.skill.entity.Skill;
 import ksh.backendserver.skill.entity.SubscriptionSkill;
+import ksh.backendserver.skill.repository.SkillRepository;
 import ksh.backendserver.skill.repository.SubscriptionSkillRepository;
 import ksh.backendserver.subscription.dto.request.SubscriptionCreationRequestDto;
+import ksh.backendserver.subscription.dto.response.SubscriptionResponseDto;
 import ksh.backendserver.subscription.model.UserSubscription;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +35,10 @@ public class SubscriptionService {
     private final SubscriptionSkillRepository subscriptionSkillRepository;
     private final SubscriptionPositionRepository subscriptionPositionRepository;
     private final SubscriptionCompanyRepository subscriptionCompanyRepository;
+
+    private final CompanyRepository companyRepository;
+    private final SkillRepository skillRepository;
+    private final PositionRepository positionRepository;
 
     @Transactional
     public void save(SubscriptionCreationRequestDto request) {
@@ -68,6 +79,42 @@ public class SubscriptionService {
         subscriptionCompanyRepository.deleteAll(companies);
         subscriptionSkillRepository.deleteAll(skills);
         subscriptionPositionRepository.deleteAll(positions);
+    }
+
+    public SubscriptionResponseDto findByMemberId(Long memberId) {
+        List<SubscriptionCompany> subscriptionCompanies = subscriptionCompanyRepository.findByUserId(memberId);
+        List<SubscriptionSkill> subscriptionSkills = subscriptionSkillRepository.findByUserId(memberId);
+        List<SubscriptionPosition> subscriptionPositions = subscriptionPositionRepository.findByUserId(memberId);
+
+        List<Long> companyIds = subscriptionCompanies.stream()
+            .map(SubscriptionCompany::getCompanyId)
+            .toList();
+
+        List<Long> skillIds = subscriptionSkills.stream()
+            .map(SubscriptionSkill::getSkillId)
+            .toList();
+
+        List<Long> positionIds = subscriptionPositions.stream()
+            .map(SubscriptionPosition::getPositionId)
+            .toList();
+
+        List<String> companyNames = companyRepository.findAllById(companyIds).stream()
+            .map(Company::getName)
+            .toList();
+
+        List<String> skillNames = skillRepository.findAllById(skillIds).stream()
+            .map(Skill::getName)
+            .toList();
+
+        List<Integer> positionIntIds = positionIds.stream()
+            .map(Long::intValue)
+            .toList();
+
+        List<String> positionNames = positionRepository.findAllById(positionIntIds).stream()
+            .map(Position::getName)
+            .toList();
+
+        return SubscriptionResponseDto.of(companyNames, skillNames, positionNames);
     }
 
     public Map<UserSubscription, List<PostSkillRequirement>> findMatchingSubscription(

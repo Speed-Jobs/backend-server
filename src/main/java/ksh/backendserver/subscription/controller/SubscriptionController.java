@@ -8,12 +8,17 @@ import jakarta.validation.Valid;
 import ksh.backendserver.common.dto.response.ApiResponseDto;
 import ksh.backendserver.subscription.dto.request.SubscriptionCreationRequestDto;
 import ksh.backendserver.subscription.dto.request.SubscriptionDeletionRequestDto;
+import ksh.backendserver.subscription.dto.request.SubscriptionRequestDto;
+import ksh.backendserver.subscription.dto.response.SubscriptionResponseDto;
 import ksh.backendserver.subscription.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "구독", description = "공고 구독 관리 API")
@@ -64,6 +69,28 @@ public class SubscriptionController {
             HttpStatus.OK.name(),
             "구독이 취소되었습니다.",
             null
+        );
+    }
+
+    @Operation(
+        summary = "구독 조회",
+        description = "사용자의 구독 정보를 조회합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "구독 조회 성공"),
+        @ApiResponse(responseCode = "400", description = "유효성 검증 실패")
+    })
+    @GetMapping("/subscriptions")
+    public ApiResponseDto<SubscriptionResponseDto> getSubscription(
+        @Valid @ModelAttribute SubscriptionRequestDto request
+    ) {
+        var response = subscriptionService.findByMemberId(request.getMemberId());
+
+        return ApiResponseDto.of(
+            HttpStatus.OK.value(),
+            HttpStatus.OK.name(),
+            "구독 조회 성공",
+            response
         );
     }
 }
