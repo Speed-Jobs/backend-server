@@ -57,6 +57,17 @@ public class SubscriptionService {
         subscriptionPositionRepository.saveAll(positions);
     }
 
+    @Transactional
+    public void cancel(Long memberId) {
+        List<SubscriptionCompany> companies = subscriptionCompanyRepository.findByUserId(memberId);
+        List<SubscriptionSkill> skills = subscriptionSkillRepository.findByUserId(memberId);
+        List<SubscriptionPosition> positions = subscriptionPositionRepository.findByUserId(memberId);
+
+        subscriptionCompanyRepository.deleteAll(companies);
+        subscriptionSkillRepository.deleteAll(skills);
+        subscriptionPositionRepository.deleteAll(positions);
+    }
+
     public Map<UserSubscription, List<PostSkillRequirement>> findMatchingSubscription(
         List<PostSkillRequirement> postings
     ) {
