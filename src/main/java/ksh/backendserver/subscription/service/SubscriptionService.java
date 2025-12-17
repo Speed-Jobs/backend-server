@@ -8,6 +8,8 @@ import ksh.backendserver.group.entity.Position;
 import ksh.backendserver.group.entity.SubscriptionPosition;
 import ksh.backendserver.group.repository.PositionRepository;
 import ksh.backendserver.group.repository.SubscriptionPositionRepository;
+import ksh.backendserver.notification.entity.NotificationPreference;
+import ksh.backendserver.notification.repository.NotificationPreferenceRepository;
 import ksh.backendserver.post.model.PostSkillRequirement;
 import ksh.backendserver.skill.entity.Skill;
 import ksh.backendserver.skill.entity.SubscriptionSkill;
@@ -35,6 +37,7 @@ public class SubscriptionService {
     private final SubscriptionSkillRepository subscriptionSkillRepository;
     private final SubscriptionPositionRepository subscriptionPositionRepository;
     private final SubscriptionCompanyRepository subscriptionCompanyRepository;
+    private final NotificationPreferenceRepository notificationPreferenceRepository;
 
     private final CompanyRepository companyRepository;
     private final SkillRepository skillRepository;
@@ -65,9 +68,18 @@ public class SubscriptionService {
                 .build())
             .toList();
 
+        List<NotificationPreference> notificationPreferences = request.getNotificationTypes()
+            .stream()
+            .map(notificationType -> NotificationPreference.builder()
+                .memberId(memberId)
+                .notificationType(notificationType)
+                .build())
+            .toList();
+
         subscriptionCompanyRepository.saveAll(companies);
         subscriptionSkillRepository.saveAll(skills);
         subscriptionPositionRepository.saveAll(positions);
+        notificationPreferenceRepository.saveAll(notificationPreferences);
     }
 
     @Transactional
@@ -75,16 +87,19 @@ public class SubscriptionService {
         List<SubscriptionCompany> companies = subscriptionCompanyRepository.findByUserId(memberId);
         List<SubscriptionSkill> skills = subscriptionSkillRepository.findByUserId(memberId);
         List<SubscriptionPosition> positions = subscriptionPositionRepository.findByUserId(memberId);
+        List<NotificationPreference> notificationPreferences = notificationPreferenceRepository.findByMemberId(memberId);
 
         subscriptionCompanyRepository.deleteAll(companies);
         subscriptionSkillRepository.deleteAll(skills);
         subscriptionPositionRepository.deleteAll(positions);
+        notificationPreferenceRepository.deleteAll(notificationPreferences);
     }
 
     public SubscriptionResponseDto findByMemberId(Long memberId) {
         List<SubscriptionCompany> subscriptionCompanies = subscriptionCompanyRepository.findByUserId(memberId);
         List<SubscriptionSkill> subscriptionSkills = subscriptionSkillRepository.findByUserId(memberId);
         List<SubscriptionPosition> subscriptionPositions = subscriptionPositionRepository.findByUserId(memberId);
+        List<NotificationPreference> notificationPreferences = notificationPreferenceRepository.findByMemberId(memberId);
 
         List<Long> companyIds = subscriptionCompanies.stream()
             .map(SubscriptionCompany::getCompanyId)
@@ -114,7 +129,11 @@ public class SubscriptionService {
             .map(Position::getName)
             .toList();
 
-        return SubscriptionResponseDto.of(companyNames, skillNames, positionNames);
+        var notificationTypes = notificationPreferences.stream()
+            .map(NotificationPreference::getNotificationType)
+            .toList();
+
+        return SubscriptionResponseDto.of(companyNames, skillNames, positionNames, notificationTypes);
     }
 
     public Map<UserSubscription, List<PostSkillRequirement>> findMatchingSubscription(
