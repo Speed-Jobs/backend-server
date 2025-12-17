@@ -33,10 +33,26 @@ public class EmailNotificationStrategy implements NotificationStrategy {
         message.setSubject(notificationContentBuilder.buildSummary(matchedPosts));
         message.setText(notificationContentBuilder.buildBody(matchedPosts));
 
-        try {
-            mailSender.send(message);
-        } catch (Exception e) {
-            log.error("이메일 알림 전송 실패. memberId={}", memberId, e);
+        int maxRetries = 3;
+        int retryDelay = 2000;
+
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                mailSender.send(message);
+                return;
+            } catch (Exception e) {
+                if (attempt == maxRetries) {
+                    log.error("이메일 알림 전송 최종 실패. memberId={}, 재시도 횟수={}", memberId, maxRetries, e);
+                } else {
+                    try {
+                        Thread.sleep(retryDelay * attempt);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        log.error("재시도 대기 중 인터럽트 발생. memberId={}", memberId);
+                        return;
+                    }
+                }
+            }
         }
     }
 
