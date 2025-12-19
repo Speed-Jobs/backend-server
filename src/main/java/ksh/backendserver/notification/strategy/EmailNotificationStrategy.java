@@ -45,7 +45,7 @@ public class EmailNotificationStrategy implements NotificationStrategy {
                     log.error("이메일 알림 전송 최종 실패. memberId={}, 재시도 횟수={}", memberId, maxRetries, e);
                 } else {
                     try {
-                        Thread.sleep(retryDelay * attempt);
+                        Thread.sleep((long) retryDelay * attempt);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
                         log.error("재시도 대기 중 인터럽트 발생. memberId={}", memberId);

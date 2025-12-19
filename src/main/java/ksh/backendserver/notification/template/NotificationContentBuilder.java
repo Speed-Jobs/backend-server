@@ -50,9 +50,9 @@ public class NotificationContentBuilder {
         }
 
         return skills.stream()
-                .map(PostSkillWithSkill::getSkill)
-                .map(Skill::getName)
-                .limit(MAX_SKILL_DISPLAY_COUNT)
-                .collect(Collectors.joining(", "));
+            .map(PostSkillWithSkill::getSkill)
+            .map(Skill::getName)
+            .limit(MAX_SKILL_DISPLAY_COUNT)
+            .collect(Collectors.joining(", "));
     }
 }

@@ -21,7 +21,7 @@ public class MemberService {
 
     public Member findLoginMember(String email, String password) {
         return memberRepository.findByEmailAndPassword(email, password)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     /**
@@ -29,10 +29,10 @@ public class MemberService {
      */
     @Transactional
     public Member register(
-            String name,
-            String email,
-            String password,
-            String passwordConfirm
+        String name,
+        String email,
+        String password,
+        String passwordConfirm
     ) {
         // 이메일 중복 검사
         if (memberRepository.existsByEmail(email)) {
@@ -46,10 +46,10 @@ public class MemberService {
 
         // Member 객체 생성
         Member member = Member.builder()
-                .name(name)
-                .email(email)
-                .password(password)
-                .build();
+            .name(name)
+            .email(email)
+            .password(password)
+            .build();
 
         // DB 저장
         return memberRepository.save(member);

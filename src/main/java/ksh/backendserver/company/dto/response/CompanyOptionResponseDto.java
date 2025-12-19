@@ -8,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CompanyOptionResponseDto {
 
-    private long  id;
+    private long id;
     private String name;
 
     public static CompanyOptionResponseDto from(Company company) {
