@@ -104,14 +104,13 @@ class PostSkillRepositoryTest {
     ) {
         return Post.builder()
             .title(title)
-            .employmentType(EmploymentType.FULL_TIME)
-            .experienceLevel(ExperienceLevel.MID_SENIOR)
-            .workType(WorkType.REMOTE)
-            .status(PostStatus.OPEN)
+            .employmentType(EmploymentType.FULL_TIME.name())
+            .experience(ExperienceLevel.MID_SENIOR.name())
+            .workType(WorkType.REMOTE.name())
             .postedAt(postedAt)
             .closeAt(closeAt)
             .companyId(companyId)
-            .roleId(roleId)
+            .jobRoleId(roleId)
             .isDeleted(false)
             .build();
     }

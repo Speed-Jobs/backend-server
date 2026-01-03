@@ -3,7 +3,7 @@ package ksh.backendserver.post.model;
 import ksh.backendserver.company.entity.Company;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
 import ksh.backendserver.post.entity.Post;
-import ksh.backendserver.role.entity.Industry;
+import ksh.backendserver.jobrole.entity.JobRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -32,7 +32,7 @@ public class PostInfo {
 
     private PostInfo(PostWithCompanyAndRole projection, LocalDate now) {
         Post post = projection.getPost();
-        Industry jobRole = projection.getJobRole();
+        JobRole jobRole = projection.getJobRole();
 
         this.id = post.getId();
         this.title = post.getTitle();

@@ -11,8 +11,8 @@ import ksh.backendserver.post.enums.EmploymentType;
 import ksh.backendserver.post.enums.ExperienceLevel;
 import ksh.backendserver.post.enums.PostSortCriteria;
 import ksh.backendserver.post.enums.WorkType;
-import ksh.backendserver.role.entity.Industry;
-import ksh.backendserver.role.repository.JobRoleRepository;
+import ksh.backendserver.jobrole.entity.JobRole;
+import ksh.backendserver.jobrole.repository.JobRoleRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,8 +41,8 @@ class PostQueryRepositoryImplTest {
 
     private Company company1;
     private Company company2;
-    private Industry jobRole1;
-    private Industry jobRole2;
+    private JobRole jobRole1;
+    private JobRole jobRole2;
     private Post post1;
     private Post post2;
     private Post post3;
@@ -93,10 +93,13 @@ class PostQueryRepositoryImplTest {
     void findByFilters_Success() {
         // given
         var postRequestDto = new PostRequestDto(
-            null,
             PostSortCriteria.POST_AT,
             false,
-            List.of("Apple")
+            List.of("Apple"),
+            null,
+            null,
+            null,
+            null
         );
         Pageable pageable = PageRequest.of(0, 10);
 
@@ -123,9 +126,12 @@ class PostQueryRepositoryImplTest {
     void findByFilters_SortByNameDescending() {
         // given
         var postRequestDto = new PostRequestDto(
-            EmploymentType.FULL_TIME,
-            PostSortCriteria.NAME,
+            PostSortCriteria.COMPANY_NAME,
             true,
+            null,
+            null,
+            null,
+            null,
             null
         );
         Pageable pageable = PageRequest.of(0, 10);
@@ -153,9 +159,12 @@ class PostQueryRepositoryImplTest {
     void findByFilters_SortByLeftDaysAscending() {
         // given
         var postRequestDto = new PostRequestDto(
-            null,
             PostSortCriteria.LEFT_DAYS,
             true,
+            null,
+            null,
+            null,
+            null,
             null
         );
         Pageable pageable = PageRequest.of(0, 10);
@@ -214,11 +223,11 @@ class PostQueryRepositoryImplTest {
             .build());
     }
 
-    private Industry createJobRole(String name) {
-        return jobRoleRepository.save(Industry.builder()
+    private JobRole createJobRole(String name) {
+        return jobRoleRepository.save(JobRole.builder()
             .name(name)
             .description("Job Role Description")
-            .positionId(1L)
+            .jobFieldId(1L)
             .isDeleted(false)
             .build());
     }
@@ -229,13 +238,13 @@ class PostQueryRepositoryImplTest {
     ) {
         return postRepository.save(Post.builder()
             .title(title)
-            .employmentType(employmentType)
-            .experience(experienceLevel)
-            .workType(WorkType.ON_SITE)
+            .employmentType(employmentType.name())
+            .experience(experienceLevel.name())
+            .workType(WorkType.ON_SITE.name())
             .postedAt(postedAt)
             .closeAt(closeAt)
             .companyId(companyId)
-            .industryId(roleId)
+            .jobRoleId(roleId)
             .sourceUrl("url")
             .isDeleted(false)
             .build());

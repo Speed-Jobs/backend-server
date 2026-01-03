@@ -4,7 +4,7 @@ import ksh.backendserver.common.util.JsonParserUtil;
 import ksh.backendserver.company.entity.Company;
 import ksh.backendserver.post.dto.projection.PostWithCompanyAndRole;
 import ksh.backendserver.post.entity.Post;
-import ksh.backendserver.role.entity.Industry;
+import ksh.backendserver.jobrole.entity.JobRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -38,7 +38,7 @@ public class PostDetail {
 
     private PostDetail(PostWithCompanyAndRole projection, List<String> skillNames, LocalDate now) {
         Post post = projection.getPost();
-        Industry jobRole = projection.getJobRole();
+        JobRole jobRole = projection.getJobRole();
 
         this.id = post.getId();
         this.title = post.getTitle();

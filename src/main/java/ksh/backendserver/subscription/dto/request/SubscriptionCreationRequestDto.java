@@ -20,7 +20,7 @@ public class SubscriptionCreationRequestDto {
     private List<Long> skillIds;
 
     @Schema(description = "구독할 직군 ID 목록", example = "[1, 2, 3]")
-    private List<Long> positionIds;
+    private List<Long> jobFieldIds;
 
     @NotEmpty(message = "알림 수단을 최소 1개 이상 선택해야 합니다.")
     @Schema(description = "알림 수단 목록 (EMAIL, SLACK)", example = "[\"EMAIL\", \"SLACK\"]")

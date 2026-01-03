@@ -13,10 +13,10 @@ public class UserSubscription {
 
     private Long userId;
     private Set<Long> skillIds;
-    private Set<Long> positionIds;
+    private Set<Long> jobFieldIds;
     private Set<Long> companyIds;
 
-    public static UserSubscription of(Long userId, Set<Long> skillIds, Set<Long> positionIds, Set<Long> companyIds) {
-        return new UserSubscription(userId, skillIds, positionIds, companyIds);
+    public static UserSubscription of(Long userId, Set<Long> skillIds, Set<Long> jobFieldIds, Set<Long> companyIds) {
+        return new UserSubscription(userId, skillIds, jobFieldIds, companyIds);
     }
 }

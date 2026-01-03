@@ -2,7 +2,7 @@ package ksh.backendserver.post.service;
 
 import ksh.backendserver.common.exception.CustomException;
 import ksh.backendserver.common.exception.ErrorCode;
-import ksh.backendserver.group.repository.PositionRepository;
+import ksh.backendserver.jobfield.repository.JobFieldRepository;
 import ksh.backendserver.post.dto.projection.PostWithCompany;
 import ksh.backendserver.post.dto.request.PostRequestDto;
 import ksh.backendserver.post.model.PostDashboardCard;
@@ -27,7 +27,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostSkillRepository postSkillRepository;
-    private final PositionRepository positionRepository;
+    private final JobFieldRepository jobFieldRepository;
     private final Clock clock;
 
     @Transactional(readOnly = true)
@@ -35,9 +35,9 @@ public class PostService {
         PostRequestDto dto,
         Pageable pageable
     ) {
-        if (dto.getPositionName() != null && !dto.getPositionName().isBlank()) {
-            positionRepository.findByName(dto.getPositionName())
-                .orElseThrow(() -> new CustomException(ErrorCode.POSITION_NOT_FOUND));
+        if (dto.getJobFieldName() != null && !dto.getJobFieldName().isBlank()) {
+            jobFieldRepository.findByName(dto.getJobFieldName())
+                .orElseThrow(() -> new CustomException(ErrorCode.JOB_FIELD_NOT_FOUND));
         }
 
         return postRepository
@@ -61,7 +61,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostDashboardCard> getRecentCompetitorPosts(int limit) {
         return postRepository
-            .findWithCompanyAndIndustryOrderByRegisteredAtDesc(limit, LocalDateTime.now(clock))
+            .findWithCompanyAndJobRoleOrderByRegisteredAtDesc(limit, LocalDateTime.now(clock))
             .stream()
             .map(PostDashboardCard::from)
             .toList();
