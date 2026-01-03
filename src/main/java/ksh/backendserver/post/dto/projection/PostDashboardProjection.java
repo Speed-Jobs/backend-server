@@ -2,7 +2,7 @@ package ksh.backendserver.post.dto.projection;
 
 import ksh.backendserver.company.entity.Company;
 import ksh.backendserver.post.entity.Post;
-import ksh.backendserver.role.entity.Industry;
+import ksh.backendserver.jobrole.entity.JobRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,6 +14,6 @@ public class PostDashboardProjection {
 
     private Post post;
     private Company company;
-    private Industry jobRole;
+    private JobRole jobRole;
     private LocalDateTime registeredAt;
 }

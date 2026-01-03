@@ -1,4 +1,4 @@
-package ksh.backendserver.role.entity;
+package ksh.backendserver.jobfield.entity;
 
 import jakarta.persistence.*;
 import ksh.backendserver.BaseEntity;
@@ -14,19 +14,18 @@ import org.hibernate.annotations.Where;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "update industry set is_deleted = true where id = ?")
+@Table(name = "subscription_job_field")
+@SQLDelete(sql = "update subscription_job_field set is_deleted = true where id = ?")
 @Where(clause = "is_deleted = false")
-public class Industry extends BaseEntity {
+public class SubscriptionJobField extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private Long userId;
 
-    private String description;
-
-    private Long positionId;
+    private Long jobFieldId;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isDeleted;

@@ -18,5 +18,5 @@ public interface PostQueryRepository {
 
     List<PostWithCompany> findByCrawledAtAfterCheckpoint(LocalDateTime checkpoint);
 
-    List<PostDashboardProjection> findWithCompanyAndIndustryOrderByRegisteredAtDesc(int limit, LocalDateTime now);
+    List<PostDashboardProjection> findWithCompanyAndJobRoleOrderByRegisteredAtDesc(int limit, LocalDateTime now);
 }

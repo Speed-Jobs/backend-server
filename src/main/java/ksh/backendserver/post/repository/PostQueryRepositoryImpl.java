@@ -21,10 +21,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static ksh.backendserver.company.entity.QCompany.company;
-import static ksh.backendserver.group.entity.QPosition.position;
+import static ksh.backendserver.jobfield.entity.QJobField.jobField;
 import static ksh.backendserver.post.entity.QPost.post;
 import static ksh.backendserver.post.enums.PostSortCriteria.POST_AT;
-import static ksh.backendserver.role.entity.QIndustry.industry;
+import static ksh.backendserver.jobrole.entity.QJobRole.jobRole;
 
 @RequiredArgsConstructor
 public class PostQueryRepositoryImpl implements PostQueryRepository {
@@ -42,12 +42,12 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 PostWithCompanyAndRole.class,
                 post,
                 company,
-                industry
+                jobRole
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .join(industry).on(post.industryId.eq(industry.id))
-            .join(position).on(industry.positionId.eq(position.id))
+            .join(jobRole).on(post.jobRoleId.eq(jobRole.id))
+            .join(jobField).on(jobRole.jobFieldId.eq(jobField.id))
             .where(
                 postSearchFilter(postRequestDto, now)
             )
@@ -61,8 +61,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .select(post.count())
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .join(industry).on(post.industryId.eq(industry.id))
-            .join(position).on(industry.positionId.eq(position.id))
+            .join(jobRole).on(post.jobRoleId.eq(jobRole.id))
+            .join(jobField).on(jobRole.jobFieldId.eq(jobField.id))
             .where(
                 postSearchFilter(postRequestDto, now)
             );
@@ -81,11 +81,11 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 PostWithCompanyAndRole.class,
                 post,
                 company,
-                industry
+                jobRole
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .join(industry).on(post.industryId.eq(industry.id))
+            .join(jobRole).on(post.jobRoleId.eq(jobRole.id))
             .where(post.id.eq(postId))
             .fetchOne();
 
@@ -114,7 +114,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public List<PostDashboardProjection> findWithCompanyAndIndustryOrderByRegisteredAtDesc(
+    public List<PostDashboardProjection> findWithCompanyAndJobRoleOrderByRegisteredAtDesc(
         int limit,
         LocalDateTime now
     ) {
@@ -123,12 +123,12 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 PostDashboardProjection.class,
                 post,
                 company,
-                industry,
+                jobRole,
                 post.postedAt.coalesce(post.crawledAt)
             ))
             .from(post)
             .join(company).on(post.companyId.eq(company.id))
-            .join(industry).on(post.industryId.eq(industry.id))
+            .join(jobRole).on(post.jobRoleId.eq(jobRole.id))
             .where(
                 post.postedAt.coalesce(post.crawledAt).loe(now),
                 company.isCompetitor.isTrue(),
@@ -147,7 +147,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             postTitleContains(dto),
             postedAtInYearMonth(dto),
             postedAtLessOrEqualThanNow(now),
-            positionNameEquals(dto),
+            jobFieldNameEquals(dto),
             notDeleted()
         );
     }
@@ -204,10 +204,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return actualPostedAt.loe(now);
     }
 
-    private BooleanExpression positionNameEquals(PostRequestDto dto) {
-        return dto.getPositionName() == null
+    private BooleanExpression jobFieldNameEquals(PostRequestDto dto) {
+        return dto.getJobFieldName() == null
             ? null
-            : position.name.lower().eq(dto.getPositionName().toLowerCase());
+            : jobField.name.lower().eq(dto.getJobFieldName().toLowerCase());
     }
 
     private BooleanExpression notDeleted() {

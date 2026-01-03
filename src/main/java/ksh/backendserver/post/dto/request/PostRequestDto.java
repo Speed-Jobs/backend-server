@@ -58,9 +58,9 @@ public class PostRequestDto {
     private String postTitle;
 
     @Schema(
-        description = "포지션명 필터 (정확히 일치). 지정하지 않으면 포지션 필터링을 적용하지 않습니다.",
+        description = "직군명 필터 (정확히 일치). 지정하지 않으면 직군 필터링을 적용하지 않습니다.",
         example = "백엔드 개발자",
         nullable = true
     )
-    private String positionName;
+    private String jobFieldName;
 }

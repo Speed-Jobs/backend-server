@@ -19,7 +19,7 @@ public class SubscriptionResponseDto {
     private List<String> skillNames;
 
     @Schema(description = "구독 중인 직군 이름 목록", example = "[\"백엔드 개발자\", \"프론트엔드 개발자\"]")
-    private List<String> positionNames;
+    private List<String> jobFieldNames;
 
     @Schema(description = "알림 수단 목록", example = "[\"EMAIL\", \"SLACK\"]")
     private List<NotificationType> channels;
@@ -27,9 +27,9 @@ public class SubscriptionResponseDto {
     public static SubscriptionResponseDto of(
         List<String> companyNames,
         List<String> skillNames,
-        List<String> positionNames,
+        List<String> jobFieldNames,
         List<NotificationType> notificationTypes
     ) {
-        return new SubscriptionResponseDto(companyNames, skillNames, positionNames, notificationTypes);
+        return new SubscriptionResponseDto(companyNames, skillNames, jobFieldNames, notificationTypes);
     }
 }

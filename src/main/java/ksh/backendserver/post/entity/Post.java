@@ -51,7 +51,7 @@ public class Post extends BaseEntity {
 
     private Long companyId;
 
-    private Long industryId;
+    private Long jobRoleId;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isDeleted;
