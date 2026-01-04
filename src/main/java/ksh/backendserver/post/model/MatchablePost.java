@@ -1,9 +1,9 @@
 package ksh.backendserver.post.model;
 
 import ksh.backendserver.company.entity.Company;
+import ksh.backendserver.jobrole.entity.JobRole;
 import ksh.backendserver.post.dto.projection.PostWithCompany;
 import ksh.backendserver.post.entity.Post;
-import ksh.backendserver.jobrole.entity.JobRole;
 import ksh.backendserver.skill.dto.projection.PostSkillWithSkill;
 import ksh.backendserver.skill.entity.PostSkill;
 import ksh.backendserver.subscription.model.UserSubscription;
@@ -15,14 +15,14 @@ import java.util.Set;
 
 @Getter
 @AllArgsConstructor
-public class PostSkillRequirement {
+public class MatchablePost {
 
     private Post post;
     private Company company;
     private JobRole jobRole;
     private List<PostSkillWithSkill> skills;
 
-    public static PostSkillRequirement of(
+    public static MatchablePost of(
         PostWithCompany postWithCompany,
         JobRole jobRole,
         List<PostSkillWithSkill> skills
@@ -30,35 +30,35 @@ public class PostSkillRequirement {
         Post post = postWithCompany.getPost();
         Company company = postWithCompany.getCompany();
 
-        return new PostSkillRequirement(post, company, jobRole, skills);
+        return new MatchablePost(post, company, jobRole, skills);
     }
 
     public boolean matchesWith(UserSubscription userSubscription) {
-        return skillMatchWith(userSubscription.getSkillIds())
-            && jobFieldMatchWith(userSubscription.getJobFieldIds())
-            && companyMatchWith(userSubscription.getCompanyIds());
+        return matchesSkill(userSubscription.getSkillIds())
+            && matchesJobField(userSubscription.getJobFieldIds())
+            && matchesCompany(userSubscription.getCompanyIds());
     }
 
-    private boolean skillMatchWith(Set<Long> skillSet) {
-        if (skillSet.isEmpty()) return true;
+    private boolean matchesSkill(Set<Long> userSkillIds) {
+        if (userSkillIds.isEmpty()) return true;
 
         return skills.stream()
             .map(PostSkillWithSkill::getPostSkill)
             .map(PostSkill::getSkillId)
-            .anyMatch(skillSet::contains);
+            .anyMatch(userSkillIds::contains);
     }
 
-    private boolean jobFieldMatchWith(Set<Long> jobFieldSet) {
-        if (jobFieldSet.isEmpty()) return true;
+    private boolean matchesJobField(Set<Long> userJobFieldIds) {
+        if (userJobFieldIds.isEmpty()) return true;
 
         if (jobRole == null) return false;
 
-        return jobFieldSet.contains(jobRole.getJobFieldId());
+        return userJobFieldIds.contains(jobRole.getJobFieldId());
     }
 
-    private boolean companyMatchWith(Set<Long> companySet) {
-        if (companySet.isEmpty()) return true;
+    private boolean matchesCompany(Set<Long> userCompanyIds) {
+        if (userCompanyIds.isEmpty()) return true;
 
-        return companySet.contains(post.getCompanyId());
+        return userCompanyIds.contains(post.getCompanyId());
     }
 }

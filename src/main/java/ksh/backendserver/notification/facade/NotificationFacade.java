@@ -31,9 +31,9 @@ public class NotificationFacade {
             return;
         }
 
-        var postSkillRequirements = postSkillService.findSkillRequirementsOf(newPosts);
+        var matchablePosts = postSkillService.findMatchablePosts(newPosts);
 
-        var matchedSubscriptionsMap = subscriptionService.findMatchingSubscription(postSkillRequirements);
+        var matchedSubscriptionsMap = subscriptionService.findMatchingSubscription(matchablePosts);
         if (matchedSubscriptionsMap.isEmpty()) {
             return;
         }

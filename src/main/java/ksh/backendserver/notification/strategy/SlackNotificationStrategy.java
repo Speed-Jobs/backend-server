@@ -5,7 +5,7 @@ import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.response.users.UsersLookupByEmailResponse;
 import ksh.backendserver.notification.enums.NotificationType;
 import ksh.backendserver.notification.template.NotificationContentBuilder;
-import ksh.backendserver.post.model.PostSkillRequirement;
+import ksh.backendserver.post.model.MatchablePost;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +28,7 @@ public class SlackNotificationStrategy implements NotificationStrategy {
     public void send(
         Long memberId,
         String memberEmail,
-        List<PostSkillRequirement> matchedPosts
+        List<MatchablePost> matchedPosts
     ) {
         try {
             MethodsClient methods = slack.methods(botToken);

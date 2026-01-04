@@ -10,7 +10,7 @@ import ksh.backendserver.jobfield.repository.JobFieldRepository;
 import ksh.backendserver.jobfield.repository.SubscriptionJobFieldRepository;
 import ksh.backendserver.notification.entity.NotificationPreference;
 import ksh.backendserver.notification.repository.NotificationPreferenceRepository;
-import ksh.backendserver.post.model.PostSkillRequirement;
+import ksh.backendserver.post.model.MatchablePost;
 import ksh.backendserver.skill.entity.Skill;
 import ksh.backendserver.skill.entity.SubscriptionSkill;
 import ksh.backendserver.skill.repository.SkillRepository;
@@ -132,8 +132,8 @@ public class SubscriptionService {
         return SubscriptionResponseDto.of(companyNames, skillNames, jobFieldNames, notificationTypes);
     }
 
-    public Map<UserSubscription, List<PostSkillRequirement>> findMatchingSubscription(
-        List<PostSkillRequirement> postings
+    public Map<UserSubscription, List<MatchablePost>> findMatchingSubscription(
+        List<MatchablePost> postings
     ) {
         List<SubscriptionSkill> allSubscribedSkills = subscriptionSkillRepository.findAll();
         List<SubscriptionJobField> allSubscribedJobFields = subscriptionJobFieldRepository.findAll();
@@ -166,14 +166,14 @@ public class SubscriptionService {
         ).flatMap(stream -> stream).collect(Collectors.toSet());
     }
 
-    private Map<UserSubscription, List<PostSkillRequirement>> buildPostMapByUsers(
+    private Map<UserSubscription, List<MatchablePost>> buildPostMapByUsers(
         Set<Long> userIds,
         List<SubscriptionSkill> allSubscribedSkills,
         List<SubscriptionJobField> allSubscribedJobFields,
         List<SubscriptionCompany> allSubscribedCompanies,
-        List<PostSkillRequirement> postings
+        List<MatchablePost> postings
     ) {
-        Map<UserSubscription, List<PostSkillRequirement>> alertMap = new HashMap<>();
+        Map<UserSubscription, List<MatchablePost>> alertMap = new HashMap<>();
 
         for (Long userId : userIds) {
             UserSubscription userSubscription = buildUserSubscription(
@@ -183,7 +183,7 @@ public class SubscriptionService {
                 allSubscribedCompanies
             );
 
-            List<PostSkillRequirement> matchedPosts = findMatchingPosts(
+            List<MatchablePost> matchedPosts = findMatchingPosts(
                 userSubscription,
                 postings
             );
@@ -227,9 +227,9 @@ public class SubscriptionService {
             .collect(Collectors.toSet());
     }
 
-    private List<PostSkillRequirement> findMatchingPosts(
+    private List<MatchablePost> findMatchingPosts(
         UserSubscription userSubscription,
-        List<PostSkillRequirement> postings
+        List<MatchablePost> postings
     ) {
         return postings.stream()
             .filter(posting -> posting.matchesWith(userSubscription))

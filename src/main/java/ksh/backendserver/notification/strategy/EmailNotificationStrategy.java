@@ -2,7 +2,7 @@ package ksh.backendserver.notification.strategy;
 
 import ksh.backendserver.notification.enums.NotificationType;
 import ksh.backendserver.notification.template.NotificationContentBuilder;
-import ksh.backendserver.post.model.PostSkillRequirement;
+import ksh.backendserver.post.model.MatchablePost;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +24,7 @@ public class EmailNotificationStrategy implements NotificationStrategy {
     private String senderAddress;
 
     @Override
-    public void send(Long memberId, String memberEmail, List<PostSkillRequirement> matchedPosts) {
+    public void send(Long memberId, String memberEmail, List<MatchablePost> matchedPosts) {
         if (matchedPosts == null || matchedPosts.isEmpty()) return;
 
         SimpleMailMessage message = new SimpleMailMessage();

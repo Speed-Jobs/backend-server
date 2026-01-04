@@ -2,7 +2,7 @@ package ksh.backendserver.skill.service;
 
 import ksh.backendserver.post.dto.projection.PostWithCompany;
 import ksh.backendserver.post.entity.Post;
-import ksh.backendserver.post.model.PostSkillRequirement;
+import ksh.backendserver.post.model.MatchablePost;
 import ksh.backendserver.jobrole.entity.JobRole;
 import ksh.backendserver.jobrole.repository.JobRoleRepository;
 import ksh.backendserver.skill.dto.projection.PostSkillWithSkill;
@@ -23,7 +23,7 @@ public class PostSkillService {
     private final JobRoleRepository jobRoleRepository;
 
     @Transactional(readOnly = true)
-    public List<PostSkillRequirement> findSkillRequirementsOf(List<PostWithCompany> posts) {
+    public List<MatchablePost> findMatchablePosts(List<PostWithCompany> posts) {
         List<Long> postIds = posts.stream()
             .map(PostWithCompany::getPost)
             .map(Post::getId)
@@ -47,8 +47,9 @@ public class PostSkillService {
             .filter(post -> postSkillMap.containsKey(post.getPost().getId()))
             .map(post -> {
                 JobRole jobRole = jobRoleMap.get(post.getPost().getJobRoleId());
-                return PostSkillRequirement.of(post, jobRole, postSkillMap.get(post.getPost().getId()));
+                return MatchablePost.of(post, jobRole, postSkillMap.get(post.getPost().getId()));
             })
             .toList();
     }
 }
+
