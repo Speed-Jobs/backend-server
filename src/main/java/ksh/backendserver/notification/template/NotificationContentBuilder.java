@@ -1,6 +1,6 @@
 package ksh.backendserver.notification.template;
 
-import ksh.backendserver.post.model.PostSkillRequirement;
+import ksh.backendserver.post.model.MatchablePost;
 import ksh.backendserver.skill.dto.projection.PostSkillWithSkill;
 import ksh.backendserver.skill.entity.Skill;
 import org.springframework.stereotype.Component;
@@ -14,19 +14,19 @@ public class NotificationContentBuilder {
     private static final int MAX_SKILL_DISPLAY_COUNT = 5;
     private static final String NO_SKILL_INFO = "정보 없음";
 
-    public String buildSummary(List<PostSkillRequirement> posts) {
+    public String buildSummary(List<MatchablePost> posts) {
         return String.format("[SpeedJobs] 새로운 매칭 공고 %d건이 도착했습니다.", posts.size());
     }
 
-    public String buildBody(List<PostSkillRequirement> posts) {
+    public String buildBody(List<MatchablePost> posts) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("안녕하세요.\n\n")
             .append("설정하신 조건에 맞는 신규 채용 공고가 도착했습니다.\n")
             .append("아래 공고를 확인해보세요 👇\n\n");
 
-        for (PostSkillRequirement requirement : posts) {
-            appendPostInfo(sb, requirement);
+        for (MatchablePost matchablePost : posts) {
+            appendPostInfo(sb, matchablePost);
         }
 
         sb.append("서비스에서 전체 공고를 확인할 수 있습니다.\n")
@@ -35,10 +35,10 @@ public class NotificationContentBuilder {
         return sb.toString();
     }
 
-    private void appendPostInfo(StringBuilder sb, PostSkillRequirement requirement) {
-        String company = requirement.getCompany().getName();
-        String title = requirement.getPost().getTitle();
-        String skills = extractSkillNames(requirement.getSkills());
+    private void appendPostInfo(StringBuilder sb, MatchablePost matchablePost) {
+        String company = matchablePost.getCompany().getName();
+        String title = matchablePost.getPost().getTitle();
+        String skills = extractSkillNames(matchablePost.getSkills());
 
         sb.append(String.format("%s - %s\n", company, title))
             .append(String.format("필요 기술: %s\n\n", skills));

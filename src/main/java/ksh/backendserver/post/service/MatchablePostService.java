@@ -1,29 +1,42 @@
-package ksh.backendserver.skill.service;
+package ksh.backendserver.post.service;
 
-import ksh.backendserver.post.dto.projection.PostWithCompany;
-import ksh.backendserver.post.entity.Post;
-import ksh.backendserver.post.model.PostSkillRequirement;
 import ksh.backendserver.jobrole.entity.JobRole;
 import ksh.backendserver.jobrole.repository.JobRoleRepository;
+import ksh.backendserver.post.dto.projection.PostWithCompany;
+import ksh.backendserver.post.entity.Post;
+import ksh.backendserver.post.model.MatchablePost;
+import ksh.backendserver.post.repository.PostRepository;
 import ksh.backendserver.skill.dto.projection.PostSkillWithSkill;
 import ksh.backendserver.skill.repository.PostSkillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PostSkillService {
+public class MatchablePostService {
 
+    private final PostRepository postRepository;
     private final PostSkillRepository postSkillRepository;
     private final JobRoleRepository jobRoleRepository;
 
     @Transactional(readOnly = true)
-    public List<PostSkillRequirement> findSkillRequirementsOf(List<PostWithCompany> posts) {
+    public List<MatchablePost> findNewMatchablePostsAfter(LocalDateTime checkpoint) {
+        List<PostWithCompany> posts = postRepository.findByCrawledAtAfterCheckpoint(checkpoint);
+
+        if (posts.isEmpty()) {
+            return List.of();
+        }
+
+        return buildMatchablePosts(posts);
+    }
+
+    private List<MatchablePost> buildMatchablePosts(List<PostWithCompany> posts) {
         List<Long> postIds = posts.stream()
             .map(PostWithCompany::getPost)
             .map(Post::getId)
@@ -47,7 +60,7 @@ public class PostSkillService {
             .filter(post -> postSkillMap.containsKey(post.getPost().getId()))
             .map(post -> {
                 JobRole jobRole = jobRoleMap.get(post.getPost().getJobRoleId());
-                return PostSkillRequirement.of(post, jobRole, postSkillMap.get(post.getPost().getId()));
+                return MatchablePost.of(post, jobRole, postSkillMap.get(post.getPost().getId()));
             })
             .toList();
     }
