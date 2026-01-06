@@ -1,20 +1,14 @@
 package ksh.backendserver.subscription.service;
 
-import ksh.backendserver.company.entity.Company;
 import ksh.backendserver.company.entity.SubscriptionCompany;
-import ksh.backendserver.company.repository.CompanyRepository;
 import ksh.backendserver.company.repository.SubscriptionCompanyRepository;
-import ksh.backendserver.jobfield.entity.JobField;
 import ksh.backendserver.jobfield.entity.SubscriptionJobField;
-import ksh.backendserver.jobfield.repository.JobFieldRepository;
 import ksh.backendserver.jobfield.repository.SubscriptionJobFieldRepository;
 import ksh.backendserver.notification.entity.NotificationPreference;
 import ksh.backendserver.notification.enums.NotificationType;
 import ksh.backendserver.notification.repository.NotificationPreferenceRepository;
 import ksh.backendserver.post.model.MatchablePost;
-import ksh.backendserver.skill.entity.Skill;
 import ksh.backendserver.skill.entity.SubscriptionSkill;
-import ksh.backendserver.skill.repository.SkillRepository;
 import ksh.backendserver.skill.repository.SubscriptionSkillRepository;
 import ksh.backendserver.subscription.dto.request.SubscriptionCreationRequestDto;
 import ksh.backendserver.subscription.dto.response.SubscriptionResponseDto;
@@ -27,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,10 +32,6 @@ public class SubscriptionService {
     private final SubscriptionJobFieldRepository subscriptionJobFieldRepository;
     private final SubscriptionCompanyRepository subscriptionCompanyRepository;
     private final NotificationPreferenceRepository notificationPreferenceRepository;
-
-    private final CompanyRepository companyRepository;
-    private final SkillRepository skillRepository;
-    private final JobFieldRepository jobFieldRepository;
 
     @Transactional
     public void save(SubscriptionCreationRequestDto request, Long memberId) {
@@ -63,36 +52,11 @@ public class SubscriptionService {
     }
 
     public SubscriptionResponseDto findByMemberId(Long memberId) {
-        List<SubscriptionCompany> subscriptionCompanies = subscriptionCompanyRepository.findByUserId(memberId);
-        List<SubscriptionSkill> subscriptionSkills = subscriptionSkillRepository.findByUserId(memberId);
-        List<SubscriptionJobField> subscriptionJobFields = subscriptionJobFieldRepository.findByUserId(memberId);
-        List<NotificationPreference> notificationPreferences = notificationPreferenceRepository.findByMemberId(memberId);
+        List<String> companyNames = subscriptionCompanyRepository.findCompanyNamesByUserId(memberId);
+        List<String> skillNames = subscriptionSkillRepository.findSkillNamesByUserId(memberId);
+        List<String> jobFieldNames = subscriptionJobFieldRepository.findJobFieldNamesByUserId(memberId);
 
-        List<Long> companyIds = subscriptionCompanies.stream()
-            .map(SubscriptionCompany::getCompanyId)
-            .toList();
-
-        List<Long> skillIds = subscriptionSkills.stream()
-            .map(SubscriptionSkill::getSkillId)
-            .toList();
-
-        List<Long> jobFieldIds = subscriptionJobFields.stream()
-            .map(SubscriptionJobField::getJobFieldId)
-            .toList();
-
-        List<String> companyNames = companyRepository.findAllById(companyIds).stream()
-            .map(Company::getName)
-            .toList();
-
-        List<String> skillNames = skillRepository.findAllById(skillIds).stream()
-            .map(Skill::getName)
-            .toList();
-
-        List<String> jobFieldNames = jobFieldRepository.findAllById(jobFieldIds).stream()
-            .map(JobField::getName)
-            .toList();
-
-        var notificationTypes = notificationPreferences.stream()
+        var notificationTypes = notificationPreferenceRepository.findByMemberId(memberId).stream()
             .map(NotificationPreference::getNotificationType)
             .toList();
 
@@ -102,23 +66,50 @@ public class SubscriptionService {
     public Map<UserSubscription, List<MatchablePost>> findMatchingSubscription(
         List<MatchablePost> postings
     ) {
-        List<SubscriptionSkill> allSubscribedSkills = subscriptionSkillRepository.findAll();
-        List<SubscriptionJobField> allSubscribedJobFields = subscriptionJobFieldRepository.findAll();
-        List<SubscriptionCompany> allSubscribedCompanies = subscriptionCompanyRepository.findAll();
+        Map<Long, Set<Long>> skillIdsByUser = subscriptionSkillRepository.findAll().stream()
+            .collect(Collectors.groupingBy(
+                SubscriptionSkill::getUserId,
+                Collectors.mapping(SubscriptionSkill::getSkillId, Collectors.toSet())
+            ));
 
-        Set<Long> userIds = collectAllSubscribingUserIds(
-            allSubscribedSkills,
-            allSubscribedJobFields,
-            allSubscribedCompanies
-        );
+        Map<Long, Set<Long>> jobFieldIdsByUser = subscriptionJobFieldRepository.findAll().stream()
+            .collect(Collectors.groupingBy(
+                SubscriptionJobField::getUserId,
+                Collectors.mapping(SubscriptionJobField::getJobFieldId, Collectors.toSet())
+            ));
 
-        return buildPostMapByUsers(
-            userIds,
-            allSubscribedSkills,
-            allSubscribedJobFields,
-            allSubscribedCompanies,
-            postings
-        );
+        Map<Long, Set<Long>> companyIdsByUser = subscriptionCompanyRepository.findAll().stream()
+            .collect(Collectors.groupingBy(
+                SubscriptionCompany::getUserId,
+                Collectors.mapping(SubscriptionCompany::getCompanyId, Collectors.toSet())
+            ));
+
+        Set<Long> userIds = Stream.of(
+            skillIdsByUser.keySet(),
+            jobFieldIdsByUser.keySet(),
+            companyIdsByUser.keySet()
+        ).flatMap(Set::stream).collect(Collectors.toSet());
+
+        Map<UserSubscription, List<MatchablePost>> result = new HashMap<>();
+
+        for (Long userId : userIds) {
+            UserSubscription userSubscription = UserSubscription.of(
+                userId,
+                skillIdsByUser.getOrDefault(userId, Set.of()),
+                jobFieldIdsByUser.getOrDefault(userId, Set.of()),
+                companyIdsByUser.getOrDefault(userId, Set.of())
+            );
+
+            List<MatchablePost> matchedPosts = postings.stream()
+                .filter(posting -> posting.matchesWith(userSubscription))
+                .toList();
+
+            if (!matchedPosts.isEmpty()) {
+                result.put(userSubscription, matchedPosts);
+            }
+        }
+
+        return result;
     }
 
     private void saveSubscriptionCompanies(List<Long> companyIds, Long memberId) {
@@ -159,87 +150,5 @@ public class SubscriptionService {
                 .build())
             .toList();
         notificationPreferenceRepository.saveAll(notificationPreferences);
-    }
-
-    private Set<Long> collectAllSubscribingUserIds(
-        List<SubscriptionSkill> allSkills,
-        List<SubscriptionJobField> allJobFields,
-        List<SubscriptionCompany> allCompanies
-    ) {
-        return Stream.of(
-            allSkills.stream().map(SubscriptionSkill::getUserId),
-            allJobFields.stream().map(SubscriptionJobField::getUserId),
-            allCompanies.stream().map(SubscriptionCompany::getUserId)
-        ).flatMap(stream -> stream).collect(Collectors.toSet());
-    }
-
-    private Map<UserSubscription, List<MatchablePost>> buildPostMapByUsers(
-        Set<Long> userIds,
-        List<SubscriptionSkill> allSubscribedSkills,
-        List<SubscriptionJobField> allSubscribedJobFields,
-        List<SubscriptionCompany> allSubscribedCompanies,
-        List<MatchablePost> postings
-    ) {
-        Map<UserSubscription, List<MatchablePost>> alertMap = new HashMap<>();
-
-        for (Long userId : userIds) {
-            UserSubscription userSubscription = buildUserSubscription(
-                userId,
-                allSubscribedSkills,
-                allSubscribedJobFields,
-                allSubscribedCompanies
-            );
-
-            List<MatchablePost> matchedPosts = findMatchingPosts(
-                userSubscription,
-                postings
-            );
-
-            if (!matchedPosts.isEmpty()) {
-                alertMap.put(userSubscription, matchedPosts);
-            }
-        }
-
-        return alertMap;
-    }
-
-    private UserSubscription buildUserSubscription(
-        Long userId,
-        List<SubscriptionSkill> allSkills,
-        List<SubscriptionJobField> allJobFields,
-        List<SubscriptionCompany> allCompanies
-    ) {
-        Set<Long> skillIds = extractIdsForUser(
-            allSkills, SubscriptionSkill::getUserId, SubscriptionSkill::getSkillId, userId
-        );
-        Set<Long> jobFieldIds = extractIdsForUser(
-            allJobFields, SubscriptionJobField::getUserId, SubscriptionJobField::getJobFieldId, userId
-        );
-        Set<Long> companyIds = extractIdsForUser(
-            allCompanies, SubscriptionCompany::getUserId, SubscriptionCompany::getCompanyId, userId
-        );
-
-        return UserSubscription.of(userId, skillIds, jobFieldIds, companyIds);
-    }
-
-    private <T> Set<Long> extractIdsForUser(
-        List<T> subscriptions,
-        Function<T, Long> userIdExtractor,
-        Function<T, Long> idExtractor,
-        Long targetUserId
-    ) {
-        return subscriptions.stream()
-            .filter(subscription -> userIdExtractor.apply(subscription).equals(targetUserId))
-            .map(idExtractor)
-            .collect(Collectors.toSet());
-    }
-
-    private List<MatchablePost> findMatchingPosts(
-        UserSubscription userSubscription,
-        List<MatchablePost> postings
-    ) {
-        return postings.stream()
-            .filter(posting -> posting.matchesWith(userSubscription))
-            .toList();
     }
 }
