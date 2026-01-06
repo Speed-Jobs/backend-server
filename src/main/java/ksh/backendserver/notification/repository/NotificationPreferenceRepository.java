@@ -9,5 +9,5 @@ public interface NotificationPreferenceRepository extends JpaRepository<Notifica
 
     List<NotificationPreference> findByMemberId(Long memberId);
 
-    List<NotificationPreference> findByMemberIdIn(List<Long> memberIds);
+    void deleteByMemberId(Long memberId);
 }

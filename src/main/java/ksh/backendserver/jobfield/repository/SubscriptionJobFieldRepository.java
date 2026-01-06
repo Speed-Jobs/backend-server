@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface SubscriptionJobFieldRepository extends JpaRepository<SubscriptionJobField, Long> {
     List<SubscriptionJobField> findByUserId(Long userId);
+
+    void deleteByUserId(Long userId);
 }
