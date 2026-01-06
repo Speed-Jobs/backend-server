@@ -56,15 +56,10 @@ public class SubscriptionService {
 
     @Transactional
     public void cancel(Long memberId) {
-        List<SubscriptionCompany> companies = subscriptionCompanyRepository.findByUserId(memberId);
-        List<SubscriptionSkill> skills = subscriptionSkillRepository.findByUserId(memberId);
-        List<SubscriptionJobField> jobFields = subscriptionJobFieldRepository.findByUserId(memberId);
-        List<NotificationPreference> notificationPreferences = notificationPreferenceRepository.findByMemberId(memberId);
-
-        subscriptionCompanyRepository.deleteAll(companies);
-        subscriptionSkillRepository.deleteAll(skills);
-        subscriptionJobFieldRepository.deleteAll(jobFields);
-        notificationPreferenceRepository.deleteAll(notificationPreferences);
+        subscriptionCompanyRepository.deleteByUserId(memberId);
+        subscriptionSkillRepository.deleteByUserId(memberId);
+        subscriptionJobFieldRepository.deleteByUserId(memberId);
+        notificationPreferenceRepository.deleteByMemberId(memberId);
     }
 
     public SubscriptionResponseDto findByMemberId(Long memberId) {
