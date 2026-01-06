@@ -9,6 +9,7 @@ import ksh.backendserver.jobfield.entity.SubscriptionJobField;
 import ksh.backendserver.jobfield.repository.JobFieldRepository;
 import ksh.backendserver.jobfield.repository.SubscriptionJobFieldRepository;
 import ksh.backendserver.notification.entity.NotificationPreference;
+import ksh.backendserver.notification.enums.NotificationType;
 import ksh.backendserver.notification.repository.NotificationPreferenceRepository;
 import ksh.backendserver.post.model.MatchablePost;
 import ksh.backendserver.skill.entity.Skill;
@@ -47,39 +48,10 @@ public class SubscriptionService {
     public void save(SubscriptionCreationRequestDto request, Long memberId) {
         cancel(memberId);
 
-        List<SubscriptionCompany> companies = request.getCompanyIds().stream()
-            .map(companyId -> SubscriptionCompany.builder()
-                .userId(memberId)
-                .companyId(companyId)
-                .build())
-            .toList();
-
-        List<SubscriptionSkill> skills = request.getSkillIds().stream()
-            .map(skillId -> SubscriptionSkill.builder()
-                .userId(memberId)
-                .skillId(skillId)
-                .build())
-            .toList();
-
-        List<SubscriptionJobField> jobFields = request.getJobFieldIds().stream()
-            .map(jobFieldId -> SubscriptionJobField.builder()
-                .userId(memberId)
-                .jobFieldId(jobFieldId)
-                .build())
-            .toList();
-
-        List<NotificationPreference> notificationPreferences = request.getNotificationTypes()
-            .stream()
-            .map(notificationType -> NotificationPreference.builder()
-                .memberId(memberId)
-                .notificationType(notificationType)
-                .build())
-            .toList();
-
-        subscriptionCompanyRepository.saveAll(companies);
-        subscriptionSkillRepository.saveAll(skills);
-        subscriptionJobFieldRepository.saveAll(jobFields);
-        notificationPreferenceRepository.saveAll(notificationPreferences);
+        saveSubscriptionCompanies(request.getCompanyIds(), memberId);
+        saveSubscriptionSkills(request.getSkillIds(), memberId);
+        saveSubscriptionJobFields(request.getJobFieldIds(), memberId);
+        saveNotificationPreferences(request.getNotificationTypes(), memberId);
     }
 
     @Transactional
@@ -152,6 +124,46 @@ public class SubscriptionService {
             allSubscribedCompanies,
             postings
         );
+    }
+
+    private void saveSubscriptionCompanies(List<Long> companyIds, Long memberId) {
+        List<SubscriptionCompany> companies = companyIds.stream()
+            .map(companyId -> SubscriptionCompany.builder()
+                .userId(memberId)
+                .companyId(companyId)
+                .build())
+            .toList();
+        subscriptionCompanyRepository.saveAll(companies);
+    }
+
+    private void saveSubscriptionSkills(List<Long> skillIds, Long memberId) {
+        List<SubscriptionSkill> skills = skillIds.stream()
+            .map(skillId -> SubscriptionSkill.builder()
+                .userId(memberId)
+                .skillId(skillId)
+                .build())
+            .toList();
+        subscriptionSkillRepository.saveAll(skills);
+    }
+
+    private void saveSubscriptionJobFields(List<Long> jobFieldIds, Long memberId) {
+        List<SubscriptionJobField> jobFields = jobFieldIds.stream()
+            .map(jobFieldId -> SubscriptionJobField.builder()
+                .userId(memberId)
+                .jobFieldId(jobFieldId)
+                .build())
+            .toList();
+        subscriptionJobFieldRepository.saveAll(jobFields);
+    }
+
+    private void saveNotificationPreferences(List<NotificationType> notificationTypes, Long memberId) {
+        List<NotificationPreference> notificationPreferences = notificationTypes.stream()
+            .map(notificationType -> NotificationPreference.builder()
+                .memberId(memberId)
+                .notificationType(notificationType)
+                .build())
+            .toList();
+        notificationPreferenceRepository.saveAll(notificationPreferences);
     }
 
     private Set<Long> collectAllSubscribingUserIds(
