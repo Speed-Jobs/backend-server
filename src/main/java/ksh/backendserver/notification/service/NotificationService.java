@@ -9,7 +9,7 @@ import ksh.backendserver.notification.enums.NotificationType;
 import ksh.backendserver.notification.repository.NotificationPreferenceRepository;
 import ksh.backendserver.notification.strategy.NotificationStrategy;
 import ksh.backendserver.post.model.MatchablePost;
-import ksh.backendserver.subscription.model.UserSubscription;
+import ksh.backendserver.subscription.model.SubscriptionMatches;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -40,8 +40,8 @@ public class NotificationService {
         this.memberRepository = memberRepository;
     }
 
-    public void sendNotifications(Map<UserSubscription, List<MatchablePost>> alertMap) {
-        alertMap.forEach((subscription, matchedPosts) ->
+    public void sendNotifications(SubscriptionMatches subscriptionMatches) {
+        subscriptionMatches.forEachMatch((subscription, matchedPosts) ->
             sendNotificationsToUser(subscription.getUserId(), matchedPosts)
         );
     }

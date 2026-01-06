@@ -29,11 +29,11 @@ public class NotificationFacade {
             return;
         }
 
-        var matchedSubscriptionsMap = subscriptionService.findMatchingSubscription(matchablePosts);
-        if (matchedSubscriptionsMap.isEmpty()) {
+        var subscriptionMatches = subscriptionService.findMatchingSubscription(matchablePosts);
+        if (subscriptionMatches.isEmpty()) {
             return;
         }
 
-        notificationService.sendNotifications(matchedSubscriptionsMap);
+        notificationService.sendNotifications(subscriptionMatches);
     }
 }
