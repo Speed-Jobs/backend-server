@@ -60,7 +60,8 @@ public class MatchablePostService {
             .filter(post -> postSkillMap.containsKey(post.getPost().getId()))
             .map(post -> {
                 JobRole jobRole = jobRoleMap.get(post.getPost().getJobRoleId());
-                return MatchablePost.of(post, jobRole, postSkillMap.get(post.getPost().getId()));
+                List<PostSkillWithSkill> usedSkills = postSkillMap.get(post.getPost().getId());
+                return MatchablePost.of(post, jobRole, usedSkills);
             })
             .toList();
     }

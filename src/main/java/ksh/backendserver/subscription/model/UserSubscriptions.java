@@ -59,6 +59,10 @@ public class UserSubscriptions {
         return new UserSubscriptions(subscriptions);
     }
 
+    public static UserSubscriptions of(List<UserSubscription> subscriptions) {
+        return new UserSubscriptions(subscriptions);
+    }
+
     public List<UserSubscription> getSubscriptions() {
         return subscriptions;
     }
