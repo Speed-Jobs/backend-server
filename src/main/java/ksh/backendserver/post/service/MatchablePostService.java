@@ -36,6 +36,19 @@ public class MatchablePostService {
         return buildMatchablePosts(posts);
     }
 
+    @Transactional(readOnly = true)
+    public MatchablePost findMatchablePostById(Long postId) {
+        var postWithCompanyAndRole = postRepository.getByIdWithCompanyAndRole(postId);
+        List<PostSkillWithSkill> skills = postSkillRepository.findWithSkillByPostIdIn(List.of(postId));
+
+        var postWithCompany = new PostWithCompany(
+            postWithCompanyAndRole.getPost(),
+            postWithCompanyAndRole.getCompany()
+        );
+
+        return MatchablePost.of(postWithCompany, postWithCompanyAndRole.getJobRole(), skills);
+    }
+
     private List<MatchablePost> buildMatchablePosts(List<PostWithCompany> posts) {
         List<Long> postIds = posts.stream()
             .map(PostWithCompany::getPost)

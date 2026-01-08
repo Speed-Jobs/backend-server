@@ -8,6 +8,7 @@ import ksh.backendserver.notification.facade.NotificationFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +29,24 @@ public class NotificationController {
     })
     @PostMapping("/api/notifications/test")
     public ResponseEntity<Void> testNotifications() {
-        notificationFacade.sendNotifications();
+        notificationFacade.sendDailyNotifications();
+
+        return ResponseEntity
+            .noContent()
+            .build();
+    }
+
+    @Operation(
+        summary = "즉시 알림 전송",
+        description = "크롤러가 새 공고 저장 후 호출하는 API. 해당 공고와 매칭되는 구독에게 즉시 알림 전송."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "알림 처리 완료")
+    })
+    @PostMapping("/api/posts/{postId}/notify")
+    public ResponseEntity<Void> notifyNewPost(@PathVariable Long postId) {
+        log.info("Received instant notification request for postId={}", postId);
+        notificationFacade.notifyNewPost(postId);
 
         return ResponseEntity
             .noContent()

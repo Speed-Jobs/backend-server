@@ -203,4 +203,34 @@ class MatchablePostServiceTest {
         // then
         assertThat(result).isEmpty();
     }
+
+    @Test
+    @DisplayName("공고 ID로 구독 정보와 매칭될 가능성이 있는 공고를 조회한다")
+    void findMatchablePostById_성공() {
+        // given
+        Post post = Post.builder()
+            .title("백엔드 개발자")
+            .companyId(company1.getId())
+            .jobRoleId(jobRole1.getId())
+            .crawledAt(CHECKPOINT)
+            .build();
+        post = postRepository.save(post);
+
+        PostSkill postSkill = PostSkill.builder()
+            .postId(post.getId())
+            .skillId(skill1.getId())
+            .build();
+        postSkillRepository.save(postSkill);
+
+        // when
+        MatchablePost result = matchablePostService.findMatchablePostById(post.getId());
+
+        // then
+        assertThat(result.getPost().getId()).isEqualTo(post.getId());
+        assertThat(result.getPost().getTitle()).isEqualTo("백엔드 개발자");
+        assertThat(result.getCompany().getName()).isEqualTo("테스트 회사");
+        assertThat(result.getJobRole().getName()).isEqualTo("백엔드 개발");
+        assertThat(result.getSkills()).hasSize(1);
+        assertThat(result.getSkills().getFirst().getSkill().getName()).isEqualTo("Java");
+    }
 }

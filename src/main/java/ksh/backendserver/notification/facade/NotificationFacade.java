@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class NotificationFacade {
     private final MatchablePostService matchablePostService;
 
     @Scheduled(cron = "0 0 8 * * *")
-    public void sendNotifications() {
+    public void sendDailyNotifications() {
         LocalDateTime checkpoint = LocalDateTime.now(clock).minusHours(25);
 
         var matchablePosts = matchablePostService.findNewMatchablePostsAfter(checkpoint);
@@ -30,6 +31,17 @@ public class NotificationFacade {
         }
 
         var subscriptionMatches = subscriptionService.findMatchingSubscription(matchablePosts);
+        if (subscriptionMatches.isEmpty()) {
+            return;
+        }
+
+        notificationService.sendNotifications(subscriptionMatches);
+    }
+
+    public void notifyNewPost(Long postId) {
+        var matchablePost = matchablePostService.findMatchablePostById(postId);
+
+        var subscriptionMatches = subscriptionService.findMatchingSubscription(List.of(matchablePost));
         if (subscriptionMatches.isEmpty()) {
             return;
         }
