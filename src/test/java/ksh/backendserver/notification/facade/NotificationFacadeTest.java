@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -59,7 +60,7 @@ class NotificationFacadeTest {
         notificationFacade.notifyNewPost(postId);
 
         // then
-        verify(notificationService).sendNotifications(matches);
+        verify(notificationService).sendNotifications(matches, true);
     }
 
     @Test
@@ -77,7 +78,7 @@ class NotificationFacadeTest {
         notificationFacade.notifyNewPost(postId);
 
         // then
-        verify(notificationService, never()).sendNotifications(any());
+        verify(notificationService, never()).sendNotifications(any(), anyBoolean());
     }
 
     private MatchablePost createMatchablePost(Long postId) {
