@@ -14,6 +14,7 @@ public enum ErrorCode {
     JOB_FIELD_NOT_FOUND(404, "jobfield.not.found"),
     COMPANY_NOT_FOUND(404, "company.not.found"),
     IMAGE_NOT_FOUND(404, "image.not.found"),
+    INSTANT_NOTIFICATION_NOT_ALLOWED(400, "instant.notification.not.allowed"),
     INTERNAL_SERVER_ERROR(500, "internal.server.error");
 
     private final int status;

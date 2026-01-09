@@ -1,5 +1,7 @@
 package ksh.backendserver.subscription.service;
 
+import ksh.backendserver.common.exception.CustomException;
+import ksh.backendserver.common.exception.ErrorCode;
 import ksh.backendserver.company.entity.SubscriptionCompany;
 import ksh.backendserver.company.repository.SubscriptionCompanyRepository;
 import ksh.backendserver.jobfield.entity.SubscriptionJobField;
@@ -32,12 +34,13 @@ public class SubscriptionService {
 
     @Transactional
     public void save(SubscriptionCreationRequestDto request, Long memberId) {
+        validateInstantNotification(request);
         cancel(memberId);
 
         saveSubscriptionCompanies(request.getCompanyIds(), memberId);
         saveSubscriptionSkills(request.getSkillIds(), memberId);
         saveSubscriptionJobFields(request.getJobFieldIds(), memberId);
-        saveNotificationPreferences(request.getNotificationTypes(), memberId);
+        saveNotificationPreferences(request.getNotificationTypes(), request.isEnableInstant(), memberId);
     }
 
     @Transactional
@@ -100,13 +103,20 @@ public class SubscriptionService {
         subscriptionJobFieldRepository.saveAll(jobFields);
     }
 
-    private void saveNotificationPreferences(List<NotificationType> notificationTypes, Long memberId) {
+    private void saveNotificationPreferences(List<NotificationType> notificationTypes, boolean enableInstant, Long memberId) {
         List<NotificationPreference> notificationPreferences = notificationTypes.stream()
             .map(notificationType -> NotificationPreference.builder()
                 .memberId(memberId)
                 .notificationType(notificationType)
+                .enableInstant(enableInstant && notificationType == NotificationType.SLACK)
                 .build())
             .toList();
         notificationPreferenceRepository.saveAll(notificationPreferences);
+    }
+
+    private void validateInstantNotification(SubscriptionCreationRequestDto request) {
+        if (request.isEnableInstant() && !request.getNotificationTypes().contains(NotificationType.SLACK)) {
+            throw new CustomException(ErrorCode.INSTANT_NOTIFICATION_NOT_ALLOWED);
+        }
     }
 }
