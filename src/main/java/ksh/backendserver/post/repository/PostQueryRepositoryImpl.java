@@ -147,6 +147,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             postTitleContains(dto),
             postedAtInYearMonth(dto),
             postedAtLessOrEqualThanNow(now),
+            closeAtGreaterThanNow(now),
             jobFieldNameEquals(dto),
             notDeleted()
         );
@@ -202,6 +203,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     private BooleanExpression postedAtLessOrEqualThanNow(LocalDateTime now) {
         var actualPostedAt = post.postedAt.coalesce(post.crawledAt);
         return actualPostedAt.loe(now);
+    }
+
+    private BooleanExpression closeAtGreaterThanNow(LocalDateTime now) {
+        return post.closeAt.gt(now);
     }
 
     private BooleanExpression jobFieldNameEquals(PostRequestDto dto) {

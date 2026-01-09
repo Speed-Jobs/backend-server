@@ -25,4 +25,7 @@ public class SubscriptionCreationRequestDto {
     @NotEmpty(message = "알림 수단을 최소 1개 이상 선택해야 합니다.")
     @Schema(description = "알림 수단 목록 (EMAIL, SLACK)", example = "[\"EMAIL\", \"SLACK\"]")
     private List<NotificationType> notificationTypes;
+
+    @Schema(description = "즉시 알림 활성화 여부 (SLACK만 지원)", example = "false")
+    private boolean enableInstant;
 }

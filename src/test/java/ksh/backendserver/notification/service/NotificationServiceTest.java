@@ -216,6 +216,106 @@ class NotificationServiceTest {
         verify(slackStrategy, never()).send(anyLong(), anyString(), anyList());
     }
 
+    @Test
+    @DisplayName("즉시 알림이 활성화된 사용자만 즉시 알림을 받는다")
+    void sendNotifications_instant_onlyEnabledUserReceivesNotification() {
+        // Given
+        long userId1 = 1L;
+        long userId2 = 2L;
+        long preference1Id = 1L;
+        long preference2Id = 2L;
+
+        var member1 = createMember(userId1, "user1@example.com", "사용자1");
+        var member2 = createMember(userId2, "user2@example.com", "사용자2");
+        var matchedPosts = List.of(createMatchablePost());
+
+        var subscription1 = createSubscription(userId1, JAVA_SKILL_ID, BACKEND_JOB_FIELD_ID, TEST_COMPANY_ID);
+        var subscription2 = createSubscription(userId2, JAVA_SKILL_ID, BACKEND_JOB_FIELD_ID, TEST_COMPANY_ID);
+        var subscriptionMatches = SubscriptionMatches.empty();
+        subscriptionMatches.addMatch(subscription1, matchedPosts);
+        subscriptionMatches.addMatch(subscription2, matchedPosts);
+
+        var preference1WithInstant = createNotificationPreference(preference1Id, userId1, NotificationType.EMAIL, true);
+        var preference2WithoutInstant = createNotificationPreference(preference2Id, userId2, NotificationType.EMAIL, false);
+
+        given(memberRepository.findById(userId1)).willReturn(Optional.of(member1));
+        given(memberRepository.findById(userId2)).willReturn(Optional.of(member2));
+        given(notificationPreferenceRepository.findByMemberId(userId1))
+            .willReturn(List.of(preference1WithInstant));
+        given(notificationPreferenceRepository.findByMemberId(userId2))
+            .willReturn(List.of(preference2WithoutInstant));
+
+        // When
+        notificationService.sendNotifications(subscriptionMatches, true);
+
+        // Then
+        verify(emailStrategy).send(userId1, "user1@example.com", matchedPosts);
+        verify(emailStrategy, never()).send(eq(userId2), anyString(), anyList());
+    }
+
+    @Test
+    @DisplayName("즉시 알림이 비활성화된 사용자는 즉시 알림을 받지 않는다")
+    void sendNotifications_instant_noEnabledPreferences_noNotificationSent() {
+        // Given
+        long userId = 1L;
+        long emailPreferenceId = 1L;
+
+        var member = createMember(userId, "test@example.com", "테스트사용자");
+        var matchedPosts = List.of(createMatchablePost());
+        var subscription = createSubscription(userId, JAVA_SKILL_ID, BACKEND_JOB_FIELD_ID, TEST_COMPANY_ID);
+        var subscriptionMatches = SubscriptionMatches.empty();
+        subscriptionMatches.addMatch(subscription, matchedPosts);
+
+        var emailPreferenceWithoutInstant = createNotificationPreference(emailPreferenceId, userId, NotificationType.EMAIL, false);
+
+        given(memberRepository.findById(userId)).willReturn(Optional.of(member));
+        given(notificationPreferenceRepository.findByMemberId(userId))
+            .willReturn(List.of(emailPreferenceWithoutInstant));
+
+        // When
+        notificationService.sendNotifications(subscriptionMatches, true);
+
+        // Then
+        verify(emailStrategy, never()).send(anyLong(), anyString(), anyList());
+    }
+
+    @Test
+    @DisplayName("일반 알림일 때는 enableInstant 설정과 무관하게 모든 사용자가 알림을 받는다")
+    void sendNotifications_nonInstant_allUsersReceiveNotification() {
+        // Given
+        long userId1 = 1L;
+        long userId2 = 2L;
+        long preference1Id = 1L;
+        long preference2Id = 2L;
+
+        var member1 = createMember(userId1, "user1@example.com", "사용자1");
+        var member2 = createMember(userId2, "user2@example.com", "사용자2");
+        var matchedPosts = List.of(createMatchablePost());
+
+        var subscription1 = createSubscription(userId1, JAVA_SKILL_ID, BACKEND_JOB_FIELD_ID, TEST_COMPANY_ID);
+        var subscription2 = createSubscription(userId2, JAVA_SKILL_ID, BACKEND_JOB_FIELD_ID, TEST_COMPANY_ID);
+        var subscriptionMatches = SubscriptionMatches.empty();
+        subscriptionMatches.addMatch(subscription1, matchedPosts);
+        subscriptionMatches.addMatch(subscription2, matchedPosts);
+
+        var preference1WithInstant = createNotificationPreference(preference1Id, userId1, NotificationType.EMAIL, true);
+        var preference2WithoutInstant = createNotificationPreference(preference2Id, userId2, NotificationType.EMAIL, false);
+
+        given(memberRepository.findById(userId1)).willReturn(Optional.of(member1));
+        given(memberRepository.findById(userId2)).willReturn(Optional.of(member2));
+        given(notificationPreferenceRepository.findByMemberId(userId1))
+            .willReturn(List.of(preference1WithInstant));
+        given(notificationPreferenceRepository.findByMemberId(userId2))
+            .willReturn(List.of(preference2WithoutInstant));
+
+        // When
+        notificationService.sendNotifications(subscriptionMatches, false);
+
+        // Then
+        verify(emailStrategy).send(userId1, "user1@example.com", matchedPosts);
+        verify(emailStrategy).send(userId2, "user2@example.com", matchedPosts);
+    }
+
     private Member createMember(Long id, String email, String name) {
         return Member.builder()
             .id(id)
@@ -236,6 +336,17 @@ class NotificationServiceTest {
             .id(id)
             .memberId(memberId)
             .notificationType(type)
+            .enableInstant(false)
+            .isDeleted(false)
+            .build();
+    }
+
+    private NotificationPreference createNotificationPreference(Long id, Long memberId, NotificationType type, boolean enableInstant) {
+        return NotificationPreference.builder()
+            .id(id)
+            .memberId(memberId)
+            .notificationType(type)
+            .enableInstant(enableInstant)
             .isDeleted(false)
             .build();
     }

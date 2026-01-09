@@ -46,6 +46,6 @@ public class NotificationFacade {
             return;
         }
 
-        notificationService.sendNotifications(subscriptionMatches);
+        notificationService.sendNotifications(subscriptionMatches, true);
     }
 }

@@ -41,16 +41,22 @@ public class NotificationService {
     }
 
     public void sendNotifications(SubscriptionMatches subscriptionMatches) {
+        sendNotifications(subscriptionMatches, false);
+    }
+
+    public void sendNotifications(SubscriptionMatches subscriptionMatches, boolean isInstant) {
         subscriptionMatches.forEachMatch((subscription, matchedPosts) ->
-            sendNotificationsToUser(subscription.getUserId(), matchedPosts)
+            sendNotificationsToUser(subscription.getUserId(), matchedPosts, isInstant)
         );
     }
 
-    private void sendNotificationsToUser(Long memberId, List<MatchablePost> matchedPosts) {
+    private void sendNotificationsToUser(Long memberId, List<MatchablePost> matchedPosts, boolean isInstant) {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND, List.of(memberId)));
 
-        List<NotificationPreference> preferences = notificationPreferenceRepository.findByMemberId(memberId);
+        List<NotificationPreference> preferences = notificationPreferenceRepository.findByMemberId(memberId).stream()
+            .filter(pref -> !isInstant || pref.isEnableInstant())
+            .toList();
 
         preferences.forEach(preference ->
             sendNotificationByType(member, preference.getNotificationType(), matchedPosts)

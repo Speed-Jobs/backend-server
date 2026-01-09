@@ -30,5 +30,8 @@ public class NotificationPreference extends BaseEntity {
     private NotificationType notificationType;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean enableInstant;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isDeleted;
 }
