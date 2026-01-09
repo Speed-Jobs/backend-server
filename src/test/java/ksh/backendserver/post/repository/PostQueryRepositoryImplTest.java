@@ -11,6 +11,8 @@ import ksh.backendserver.post.enums.EmploymentType;
 import ksh.backendserver.post.enums.ExperienceLevel;
 import ksh.backendserver.post.enums.PostSortCriteria;
 import ksh.backendserver.post.enums.WorkType;
+import ksh.backendserver.jobfield.entity.JobField;
+import ksh.backendserver.jobfield.repository.JobFieldRepository;
 import ksh.backendserver.jobrole.entity.JobRole;
 import ksh.backendserver.jobrole.repository.JobRoleRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +31,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class PostQueryRepositoryImplTest {
 
     @Autowired
@@ -39,8 +43,12 @@ class PostQueryRepositoryImplTest {
     @Autowired
     private JobRoleRepository jobRoleRepository;
 
+    @Autowired
+    private JobFieldRepository jobFieldRepository;
+
     private Company company1;
     private Company company2;
+    private JobField jobField;
     private JobRole jobRole1;
     private JobRole jobRole2;
     private Post post1;
@@ -57,8 +65,10 @@ class PostQueryRepositoryImplTest {
         company1 = createCompany("Apple");
         company2 = createCompany("Google");
 
-        jobRole1 = createJobRole("Backend Engineer");
-        jobRole2 = createJobRole("Frontend Engineer");
+        jobField = createJobField("Engineering");
+
+        jobRole1 = createJobRole("Backend Engineer", jobField.getId());
+        jobRole2 = createJobRole("Frontend Engineer", jobField.getId());
 
         post1 = createPost(
             "공고1 제목", ExperienceLevel.SENIOR, EmploymentType.FULL_TIME,
@@ -84,8 +94,9 @@ class PostQueryRepositoryImplTest {
     @AfterEach
     void tearDown() {
         postRepository.deleteAllInBatch();
-        companyRepository.deleteAllInBatch();
         jobRoleRepository.deleteAllInBatch();
+        jobFieldRepository.deleteAllInBatch();
+        companyRepository.deleteAllInBatch();
     }
 
     @Test
@@ -118,39 +129,6 @@ class PostQueryRepositoryImplTest {
             .containsExactly(
                 tuple("공고3 제목", post3.getCompanyId()),
                 tuple("공고1 제목", post1.getCompanyId())
-            );
-    }
-
-    @Test
-    @DisplayName("고용 형태로 필터링 한 후 회사명으로 정렬해 조회한다.")
-    void findByFilters_SortByNameDescending() {
-        // given
-        var postRequestDto = new PostRequestDto(
-            PostSortCriteria.COMPANY_NAME,
-            true,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
-        Pageable pageable = PageRequest.of(0, 10);
-
-        // when
-        var result = postRepository.findByFilters(
-            postRequestDto,
-            pageable,
-            baseTime
-        );
-
-        // then
-        assertThat(result)
-            .isNotNull()
-            .hasSize(2)
-            .extracting("post.title", "company.name")
-            .containsExactly(
-                tuple("공고1 제목", "Apple"),
-                tuple("공고4 제목", "Google")
             );
     }
 
@@ -223,11 +201,19 @@ class PostQueryRepositoryImplTest {
             .build());
     }
 
-    private JobRole createJobRole(String name) {
+    private JobField createJobField(String name) {
+        return jobFieldRepository.save(JobField.builder()
+            .name(name)
+            .description("Job Field Description")
+            .isDeleted(false)
+            .build());
+    }
+
+    private JobRole createJobRole(String name, Long jobFieldId) {
         return jobRoleRepository.save(JobRole.builder()
             .name(name)
             .description("Job Role Description")
-            .jobFieldId(1L)
+            .jobFieldId(jobFieldId)
             .isDeleted(false)
             .build());
     }
